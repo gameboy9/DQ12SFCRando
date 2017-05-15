@@ -500,6 +500,7 @@ namespace DQ12SFCRando
 
                 byteToUse = 0x5da0e + (18 * lnI) + 5;
                 int gp = romData[byteToUse] + (256 * (romData[byteToUse + 9] / 64));
+                gp = gp * trkExperience.Value / 10;
                 gp = (gp > 1000 ? 1000 : gp);
                 romData[byteToUse] = (byte)(gp % 256);
                 romData[byteToUse + 9] = (byte)((romData[byteToUse + 9] % 64) + (64 * (gp / 256)));

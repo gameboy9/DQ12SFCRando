@@ -320,7 +320,7 @@
             this.trkExperience.Maximum = 50;
             this.trkExperience.Minimum = 5;
             this.trkExperience.Name = "trkExperience";
-            this.trkExperience.Size = new System.Drawing.Size(104, 45);
+            this.trkExperience.Size = new System.Drawing.Size(156, 45);
             this.trkExperience.TabIndex = 74;
             this.trkExperience.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkExperience.Value = 10;
@@ -332,7 +332,7 @@
             this.trkGoldReq.Maximum = 50;
             this.trkGoldReq.Minimum = 10;
             this.trkGoldReq.Name = "trkGoldReq";
-            this.trkGoldReq.Size = new System.Drawing.Size(104, 45);
+            this.trkGoldReq.Size = new System.Drawing.Size(156, 45);
             this.trkGoldReq.TabIndex = 75;
             this.trkGoldReq.TickStyle = System.Windows.Forms.TickStyle.None;
             this.trkGoldReq.Value = 10;
@@ -341,7 +341,7 @@
             // lblExperience
             // 
             this.lblExperience.AutoSize = true;
-            this.lblExperience.Location = new System.Drawing.Point(334, 295);
+            this.lblExperience.Location = new System.Drawing.Point(393, 295);
             this.lblExperience.Name = "lblExperience";
             this.lblExperience.Size = new System.Drawing.Size(33, 13);
             this.lblExperience.TabIndex = 78;
@@ -350,7 +350,7 @@
             // lblGoldReq
             // 
             this.lblGoldReq.AutoSize = true;
-            this.lblGoldReq.Location = new System.Drawing.Point(334, 318);
+            this.lblGoldReq.Location = new System.Drawing.Point(393, 318);
             this.lblGoldReq.Name = "lblGoldReq";
             this.lblGoldReq.Size = new System.Drawing.Size(33, 13);
             this.lblGoldReq.TabIndex = 79;
