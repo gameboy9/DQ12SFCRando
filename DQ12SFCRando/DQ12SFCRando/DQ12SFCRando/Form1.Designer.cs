@@ -369,9 +369,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(28, 295);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(90, 13);
+            this.label8.Size = new System.Drawing.Size(110, 13);
             this.label8.TabIndex = 82;
-            this.label8.Text = "Boost Experience";
+            this.label8.Text = "Boost Experience/GP";
             // 
             // label9
             // 

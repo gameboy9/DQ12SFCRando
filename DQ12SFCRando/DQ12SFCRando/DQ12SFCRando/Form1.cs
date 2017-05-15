@@ -235,16 +235,41 @@ namespace DQ12SFCRando
 
         private void cmdRandomize_Click(object sender, EventArgs e)
         {
-            loadRom();
-            Random r1 = new Random(Convert.ToInt32(txtSeed.Text));
-            if (chkMonsterZones.Checked) randomizeMonsterZones(r1);
-            if (chkMonsterPatterns.Checked) randomizeMonsterPatterns(r1);
-            if (chkHeroStats.Checked) randomizeHeroStats(r1);
-            if (chkTreasures.Checked) randomizeTreasures(r1);
-            if (chkStores.Checked) randomizeStores(r1);
-            boostExp();
-            goldRequirements(r1);
-            saveRom();
+            try
+            {
+                loadRom();
+                Random r1 = new Random(Convert.ToInt32(txtSeed.Text));
+                monsterAdjustments();
+                if (chkMonsterZones.Checked) randomizeMonsterZones(r1);
+                if (chkMonsterPatterns.Checked) randomizeMonsterPatterns(r1);
+                if (chkHeroStats.Checked) randomizeHeroStats(r1);
+                if (chkTreasures.Checked) randomizeTreasures(r1);
+                if (chkStores.Checked) randomizeStores(r1);
+                boostExp();
+                goldRequirements(r1);
+                saveRom();
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Error:  " + ex.Message);
+            }
+        }
+
+        private void monsterAdjustments()
+        {
+            int byteToUse = 0x5da0e + (25 * 18);
+            // Set Goldman to 48 XP, 1000 GP
+            romData[byteToUse + 16] = 48;
+            romData[byteToUse + 14] = 0xc1;
+            romData[byteToUse + 5] = 0xe8;
+
+            // Set Stoneman to 210 XP
+            byteToUse = 0x5da0e + (35 * 18);
+            romData[byteToUse + 16] = 210;
+
+            // Set Golem to 300 XP
+            byteToUse = 0x5da0e + (24 * 18);
+            romData[byteToUse + 16] = 44;
+            romData[byteToUse + 17] = 1;
         }
 
         private void randomizeMonsterZones(Random r1)
@@ -469,8 +494,15 @@ namespace DQ12SFCRando
                 int byteToUse = 0x5da0e + (18 * lnI) + 16;
                 int xp = romData[byteToUse] + (256 * romData[byteToUse + 1]);
                 xp = xp * trkExperience.Value / 10;
+                xp = (xp > 65000 ? 65000 : xp);
                 romData[byteToUse] = (byte)(xp % 256);
                 romData[byteToUse + 1] = (byte)(xp / 256);
+
+                byteToUse = 0x5da0e + (18 * lnI) + 5;
+                int gp = romData[byteToUse] + (256 * (romData[byteToUse + 9] / 64));
+                gp = (gp > 1000 ? 1000 : gp);
+                romData[byteToUse] = (byte)(gp % 256);
+                romData[byteToUse + 9] = (byte)((romData[byteToUse + 9] % 64) + (64 * (gp / 256)));
             }
         }
 
