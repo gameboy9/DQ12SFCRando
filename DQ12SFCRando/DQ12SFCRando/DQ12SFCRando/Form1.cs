@@ -301,14 +301,26 @@ namespace DQ12SFCRando
                 int byteToUse = 0x5da0e + (lnI * 18);
 
                 if (r1.Next() % 2 == 1)
+                {
                     for (int lnJ = 0; lnJ < 8; lnJ++)
                         if (r1.Next() % 2 != 0)
                             monsterPattern[lnJ] = (lnI <= 40 ? dq1Pattern[r1.Next() % dq1Pattern.Length] : dq2Pattern[r1.Next() % dq2Pattern.Length]);
                         else
                             monsterPattern[lnJ] = (lnI <= 40 ? 0 : (r1.Next() % 100 <= (lnI - 40) ? 30 : 0));
+
+                    if (romData[byteToUse + 4] < 8 && r1.Next() % 2 == 0)
+                        romData[byteToUse + 4] = (byte)(r1.Next() % 16);
+                }
                 else
                     for (int lnJ = 0; lnJ < 8; lnJ++)
                         monsterPattern[lnJ] = (lnI <= 40 ? 0 : (r1.Next() % 100 <= (lnI - 40) ? 30 : 0));
+
+                if (lnI == 16 || lnI == 87 || lnI == 105) // Metal Slime, Metal Babble
+                {
+                    monsterPattern[1] = 0x05;
+                    monsterPattern[3] = 0x05;
+                    monsterPattern[5] = 0x05;
+                }
 
                 for (int lnJ = 0; lnJ < 8; lnJ++)
                     romData[byteToUse + 6 + lnJ] = (byte)(monsterPattern[lnJ] + (romData[byteToUse + 6] - (romData[byteToUse + 6] % 32)));
@@ -424,7 +436,60 @@ namespace DQ12SFCRando
 
         private void randomizeTreasures(Random r1)
         {
-            
+            int[] dq1Zone1 = { 0xe1c47, 0xe1c7b, 0xe1ca2,
+                0xe095d, 0xe099e, 0xe0984, 0xe09d2, 0xe09b8,
+                0xe296c, 0xe29ba, 0xe29d4,
+                0xe0e1d,
+                0xe12cc, 0xe12f3,
+                0xe2570, 0xe2555, 0xe25a4, 0xe258a, 0xe25be, 0xe25d8, 0xe25f2,
+                0xe1b62, 0xe1b48, 0xe1b23, 0xe1ac6,
+                0xe10e6, 0xe1100, 0xe111a,
+                0xe2211, 0xe21f7, 0xe21dd, 0xe2260, 0xe227a,
+                0xe16e8, 0xe1702, 0xe171c,
+                0xe22a3, 0xe22bd, 0xe27ed, 0xe1f74, 0xe1fdc, 0xe1fc2, 0xe1fa8, 0xe1f8e, 0xe1f5a, 0xe1f0c, 0xe1f26, 0xe1f40 };
+
+            int[] dq1Items = { 0x04, 0x08, 0x0a,
+                0xbc, 0x0a, 0x24, 0x26, 0x28,
+                0x10, 0x38, 0x2a,
+                0xc4,
+                0x30, 0x32,
+                0x14, 0x24, 0x28, 0x3c, 0xe6, 0xe8, 0xec,
+                0x34, 0x3a, 0xc4, 0xd4,
+                0xe4, 0x2c, 0x08,
+                0xd4, 0xea, 0x0a, 0x24, 0x1a,
+                0xbe, 0xc0, 0xc2,
+                0x0c, 0x18, 0x1c, 0x12, 0x28, 0x0c, 0x3e, 0x02, 0x0a, 0x02, 0x18, 0x0e };
+
+            // Limits:  2, 35, 47
+            int[] dq1Max = { 47, 47, 2,
+                47, 47, 47, 47, 47,
+                35, 47, 47,
+                47,
+                47, 47,
+                47, 47, 47, 47, 47, 47, 47,
+                47, 47, 47, 47,
+                47, 47, 47,
+                47, 47, 47, 47, 35,
+                47, 47, 47,
+                47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47 };
+
+            int[] specialZone = { 0x4ae33, 0x4ae38, 0x4ae43 };
+            int[] specialItems = { 0x1a, 0x1f, 0x0e };
+
+            for (int lnI = 0; lnI < dq1Zone1.Length * 25; lnI++)
+            {
+                int first = r1.Next() % dq1Zone1.Length;
+                int second = r1.Next() % dq1Zone1.Length;
+                if (first == second) continue;
+                if (second > dq1Max[first] || first > dq1Max[second]) continue;
+                swapArray(dq1Items, first, second);
+                swapArray(dq1Max, first, second);
+            }
+
+            for (int lnI = 0; lnI < dq1Zone1.Length; lnI++)
+            {
+                romData[dq1Zone1[lnI]] = (byte)((dq1Items[lnI]) / 2 + 0x80);
+            }
         }
 
         private void randomizeStores(Random r1)

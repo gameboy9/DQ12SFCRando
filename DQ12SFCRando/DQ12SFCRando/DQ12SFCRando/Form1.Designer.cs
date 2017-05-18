@@ -241,7 +241,6 @@
             // chkTreasures
             // 
             this.chkTreasures.AutoSize = true;
-            this.chkTreasures.Enabled = false;
             this.chkTreasures.Location = new System.Drawing.Point(12, 248);
             this.chkTreasures.Name = "chkTreasures";
             this.chkTreasures.Size = new System.Drawing.Size(129, 17);
