@@ -436,17 +436,19 @@ namespace DQ12SFCRando
 
         private void randomizeTreasures(Random r1)
         {
-            int[] dq1Zone1 = { 0xe1c47, 0xe1c7b, 0xe1ca2,
-                0xe095d, 0xe099e, 0xe0984, 0xe09d2, 0xe09b8,
-                0xe296c, 0xe29ba, 0xe29d4,
-                0xe0e1d,
-                0xe12cc, 0xe12f3,
-                0xe2570, 0xe2555, 0xe25a4, 0xe258a, 0xe25be, 0xe25d8, 0xe25f2,
-                0xe1b62, 0xe1b48, 0xe1b23, 0xe1ac6,
-                0xe10e6, 0xe1100, 0xe111a,
-                0xe2211, 0xe21f7, 0xe21dd, 0xe2260, 0xe227a,
-                0xe16e8, 0xe1702, 0xe171c,
-                0xe22a3, 0xe22bd, 0xe27ed, 0xe1f74, 0xe1fdc, 0xe1fc2, 0xe1fa8, 0xe1f8e, 0xe1f5a, 0xe1f0c, 0xe1f26, 0xe1f40 };
+            romData[0xd9101] = 0x02; // Instead of 0x03.  This prevents loading of a sprite that doesn't exist when picking up a special item (Stones of Sunlight... Erdrick's Sword...)
+
+            int[] dq1Zone1 = { 0xe1c47, 0xe1c7b, 0xe1ca2, // 0-2
+                0xe095d, 0xe099e, 0xe0984, 0xe09d2, 0xe09b8, // 3-7
+                0xe296c, 0xe29ba, 0xe29d4, // 8-10
+                0xe0e1d, // 11
+                0xe12cc, 0xe12f3, // 12-13
+                0xe2570, 0xe2555, 0xe25a4, 0xe258a, 0xe25be, 0xe25d8, 0xe25f2, // 14-20
+                0xe1b62, 0xe1b48, 0xe1b23, 0xe1ac6, // 21-24
+                0xe10e6, 0xe1100, 0xe111a, // 25-27
+                0xe2211, 0xe21f7, 0xe21dd, 0xe2260, 0xe227a, // 28-32
+                0xe16e8, 0xe1702, 0xe171c, // 33-35
+                0xe22a3, 0xe22bd, 0xe27ed, 0xe1f74, 0xe1fdc, 0xe1fc2, 0xe1fa8, 0xe1f8e, 0xe1f5a, 0xe1f0c, 0xe1f26, 0xe1f40 }; // 36-47
 
             int[] dq1Items = { 0x04, 0x08, 0x0a,
                 0xbc, 0x0a, 0x24, 0x26, 0x28,
@@ -459,6 +461,9 @@ namespace DQ12SFCRando
                 0xd4, 0xea, 0x0a, 0x24, 0x1a,
                 0xbe, 0xc0, 0xc2,
                 0x0c, 0x18, 0x1c, 0x12, 0x28, 0x0c, 0x3e, 0x02, 0x0a, 0x02, 0x18, 0x0e };
+
+            //List<int> dq1Jars = new List<int> { 3, 9, 10, 11, 12, 13, 21, 22, 23, 33, 34, 35 };
+            //List<int> keyItems = new List<int> { 0x10, 0x1a, 0x1c };
 
             // Limits:  2, 35, 47
             int[] dq1Max = { 47, 47, 2,
@@ -482,6 +487,7 @@ namespace DQ12SFCRando
                 int second = r1.Next() % dq1Zone1.Length;
                 if (first == second) continue;
                 if (second > dq1Max[first] || first > dq1Max[second]) continue;
+                //if ((keyItems.Contains(dq1Items[first]) || keyItems.Contains(dq1Items[second])) && (dq1Jars.Contains(first) || dq1Jars.Contains(second))) continue; // Do not place key items in a jar or a shelf
                 swapArray(dq1Items, first, second);
                 swapArray(dq1Max, first, second);
             }
