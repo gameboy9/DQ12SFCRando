@@ -280,7 +280,7 @@ namespace DQ12SFCRando
                 {
                     int byteToUse = 0x5b52d + (lnI * 5) + lnJ;
                     int min = (lnI >= 16 ? 30 : 1);
-                    int max = (lnI <= 3 ? 3 * (lnI + 1) : 38);
+                    int max = (lnI == 0 ? 5 : lnI == 1 ? 10 : lnI == 2 ? 15 : 38);
 
                     romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min);
                 }
@@ -323,7 +323,10 @@ namespace DQ12SFCRando
                 }
 
                 for (int lnJ = 0; lnJ < 8; lnJ++)
-                    romData[byteToUse + 6 + lnJ] = (byte)(monsterPattern[lnJ] + (romData[byteToUse + 6] - (romData[byteToUse + 6] % 32)));
+                {
+                    int initial = romData[byteToUse + 6 + lnJ] - (romData[byteToUse + 6 + lnJ] % 32);
+                    romData[byteToUse + 6 + lnJ] = (byte)(initial + monsterPattern[lnJ]);
+                }
             }
         }
 
@@ -359,7 +362,8 @@ namespace DQ12SFCRando
             byte starterSpells = 0;
             for (int lnJ = 0; lnJ < dq1Spells.Length; lnJ++)
             {
-                if (dq1SpellsLearned[lnJ] <= 1) starterSpells++;
+                if (dq1SpellsLearned[lnJ] == 0) dq1SpellsLearned[lnJ] = 1;
+                if (dq1SpellsLearned[lnJ] == 1) starterSpells++;
                 if (prevLevel >= 2 && dq1SpellsLearned[lnJ] <= prevLevel)
                 {
                     dq1SpellsLearned[lnJ]++;
@@ -437,46 +441,57 @@ namespace DQ12SFCRando
         private void randomizeTreasures(Random r1)
         {
             romData[0xd9101] = 0x02; // Instead of 0x03.  This prevents loading of a sprite that doesn't exist when picking up a special item (Stones of Sunlight... Erdrick's Sword...)
+            romData[0xe23ea] = 0x08; // Push the silver harp guy out of the way due to a trigger that I can't find that fires when you find the vanilla Silver Harp.  (It doesn't fire when you get the randomized Silver Harp)  This is temporary until the trigger is found.
+            romData[0xe2934] = 0x04; // Move the stones guy out of the way to save about 10 seconds talking to him.
+            romData[0xe102c] = 0x06; // NEXT 6 LINES:  Get rid of Garinham blockers
+            romData[0xe102d] = 0x0e;
+            romData[0xe10d5] = 0x0a;
+            romData[0xe10d6] = 0x0e;
+            romData[0xe113d] = 0x26;
+            romData[0xe113e] = 0x06;
 
             int[] dq1Zone1 = { 0xe1c47, 0xe1c7b, 0xe1ca2, // 0-2
                 0xe095d, 0xe099e, 0xe0984, 0xe09d2, 0xe09b8, // 3-7
                 0xe296c, 0xe29ba, 0xe29d4, // 8-10
                 0xe0e1d, // 11
-                0xe12cc, 0xe12f3, // 12-13
-                0xe2570, 0xe2555, 0xe25a4, 0xe258a, 0xe25be, 0xe25d8, 0xe25f2, // 14-20
-                0xe1b62, 0xe1b48, 0xe1b23, 0xe1ac6, // 21-24
-                0xe10e6, 0xe1100, 0xe111a, // 25-27
-                0xe2211, 0xe21f7, 0xe21dd, 0xe2260, 0xe227a, // 28-32
-                0xe16e8, 0xe1702, 0xe171c, // 33-35
-                0xe22a3, 0xe22bd, 0xe27ed, 0xe1f74, 0xe1fdc, 0xe1fc2, 0xe1fa8, 0xe1f8e, 0xe1f5a, 0xe1f0c, 0xe1f26, 0xe1f40 }; // 36-47
+                0xe23ba, // 12
+                0xe12cc, 0xe12f3, // 13-14
+                0xe2570, 0xe2555, 0xe25a4, 0xe258a, 0xe25be, 0xe25d8, 0xe25f2, // 15-21
+                0xe1b62, 0xe1b48, 0xe1b23, 0xe1ac6, // 22-25
+                0xe10e6, 0xe1100, 0xe111a, // 26-28
+                0xe2211, 0xe21f7, 0xe21dd, 0xe2260, 0xe227a, // 29-33
+                0xe16e8, 0xe1702, 0xe171c, // 34-36
+                0xe22a3, 0xe22bd, 0xe27ed, 0xe1f74, 0xe1fdc, 0xe1fc2, 0xe1fa8, 0xe1f8e, 0xe1f5a, 0xe1f0c, 0xe1f26, 0xe1f40 }; // 37-48
 
             int[] dq1Items = { 0x04, 0x08, 0x0a,
                 0xbc, 0x0a, 0x24, 0x26, 0x28,
                 0x10, 0x38, 0x2a,
                 0xc4,
+                0x1e,
                 0x30, 0x32,
                 0x14, 0x24, 0x28, 0x3c, 0xe6, 0xe8, 0xec,
                 0x34, 0x3a, 0xc4, 0xd4,
                 0xe4, 0x2c, 0x08,
-                0xd4, 0xea, 0x0a, 0x24, 0x1a,
+                0xd4, 0xea, 0x0a, 0x24, 0x18, //0x1a
                 0xbe, 0xc0, 0xc2,
                 0x0c, 0x18, 0x1c, 0x12, 0x28, 0x0c, 0x3e, 0x02, 0x0a, 0x02, 0x18, 0x0e };
 
             //List<int> dq1Jars = new List<int> { 3, 9, 10, 11, 12, 13, 21, 22, 23, 33, 34, 35 };
             //List<int> keyItems = new List<int> { 0x10, 0x1a, 0x1c };
 
-            // Limits:  2, 35, 47
-            int[] dq1Max = { 47, 47, 2,
-                47, 47, 47, 47, 47,
-                35, 47, 47,
-                47,
-                47, 47,
-                47, 47, 47, 47, 47, 47, 47,
-                47, 47, 47, 47,
-                47, 47, 47,
-                47, 47, 47, 47, 35,
-                47, 47, 47,
-                47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47 };
+            // Limits:  2, 36, 48
+            int[] dq1Max = { 48, 48, 2,
+                48, 48, 48, 48, 48,
+                36, 48, 48,
+                48,
+                36,
+                48, 48,
+                48, 48, 48, 48, 48, 48, 48,
+                48, 48, 48, 48,
+                48, 48, 48,
+                48, 48, 48, 48, 48,
+                48, 48, 48,
+                48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48 };
 
             int[] specialZone = { 0x4ae33, 0x4ae38, 0x4ae43 };
             int[] specialItems = { 0x1a, 0x1f, 0x0e };
