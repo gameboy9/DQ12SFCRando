@@ -270,6 +270,10 @@ namespace DQ12SFCRando
             byteToUse = 0x5da0e + (24 * 18);
             romData[byteToUse + 16] = 44;
             romData[byteToUse + 17] = 1;
+
+            // Set Dragon Loop monster to 262 XP (65% strength * 100% defense * sqrt(75% agility) * 230% HP * 1.5 = 262 XP)
+            romData[0x591ce] = 0x06;
+            romData[0x591cf] = 0x01;
         }
 
         private void randomizeMonsterZones(Random r1)
@@ -285,6 +289,53 @@ namespace DQ12SFCRando
                     romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min);
                 }
             }
+
+            // Alter princess monster - 10% chance of totally randomized monster, 90% chance of Demon Knight or worse.  It can never be a metal slime.
+            int princessMonster = 17;
+            if (r1.Next() % 10 == 0)
+            {
+                while (princessMonster == 17)
+                    princessMonster = ((r1.Next() % (38 - 1)) + 1);
+            }
+            else
+            {
+                int[] legalMonsters = { 0x19, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26 };
+                princessMonster = legalMonsters[(r1.Next() % (legalMonsters.Length))];
+            }
+
+            int strength = romData[0x5DA0E + (18 * (princessMonster - 1)) + 1];
+            int defense = romData[0x5DA0E + (18 * (princessMonster - 1)) + 2];
+            int agility = romData[0x5DA0E + (18 * (princessMonster - 1))];
+            int hp = romData[0x5DA0E + (18 * (princessMonster - 1)) + 3];
+
+            int newStr = ScaleValue(strength, 2.0, 1.0, r1);
+            int newAgi = ScaleValue(agility, 2.0, 1.0, r1);
+            int newDef = ScaleValue(agility, 2.0, 1.0, r1);
+            int newHP = (hp * 3 / 2) + ScaleValue(hp, 2.0, 1.0, r1);
+
+            if (newHP < 125) newHP = 125;
+            if (newHP > 255) newHP = 255;
+
+            int xp = romData[0x5da0e + (18 * (princessMonster - 1)) + 16];
+            xp += (romData[0x5da0e + (18 * (princessMonster - 1)) + 17] * 256);
+
+            double newXP = Math.Floor(((double)newStr / strength) * ((double)newDef / defense) * Math.Sqrt((double)newAgi / agility) * ((double)newHP / hp) * xp * 1.5);
+
+            romData[0x5084] = (byte)princessMonster;
+            romData[0x591ce] = (byte)(newXP % 256);
+            romData[0x591cf] = (byte)(newXP / 256);
+
+            romData[0x59bc7] = (byte)(newHP);
+            romData[0x59bcf] = 0x14; // 20 MP automatically
+            romData[0x59bd7] = (byte)(newAgi);
+            romData[0x59bdc] = (byte)(newDef);
+            romData[0x59be4] = (byte)(newStr);
+
+            // Alter Erdrick's Armor monster - anywhere from Green Dragon to Red Dragon
+            int[] legalMonsters2 = { 0x19, 0x1f, 0x22, 0x23, 0x24, 0x25, 0x26 };
+            princessMonster = legalMonsters2[(r1.Next() % (legalMonsters2.Length))];
+
+            romData[0x500f] = (byte)princessMonster;
         }
 
         private void randomizeMonsterPatterns(Random r1)
@@ -591,6 +642,13 @@ namespace DQ12SFCRando
                 romData[byteToUse] = (byte)(gp % 256);
                 romData[byteToUse + 9] = (byte)((romData[byteToUse + 9] % 64) + (64 * (gp / 256)));
             }
+
+            // Set Dragon Loop monster to 262 XP (65% strength * 100% defense * sqrt(75% agility) * 230% HP * 1.5 = 262 XP)
+            int xpPrincess = romData[0x591ce] + (romData[0x591cf] * 256);
+            xpPrincess = xpPrincess * trkExperience.Value / 10;
+            xpPrincess = (xpPrincess > 65000 ? 65000 : xpPrincess);
+            romData[0x591ce] = (byte)(xpPrincess % 256);
+            romData[0x591cf] = (byte)(xpPrincess / 256);
         }
 
         private void goldRequirements(Random r1)
