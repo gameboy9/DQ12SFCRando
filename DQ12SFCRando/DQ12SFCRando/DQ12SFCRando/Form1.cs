@@ -359,8 +359,8 @@ namespace DQ12SFCRando
                         else
                             monsterPattern[lnJ] = (lnI <= 40 ? 0 : (r1.Next() % 100 <= (lnI - 40) ? 30 : 0));
 
-                    if (romData[byteToUse + 4] < 8 && r1.Next() % 2 == 0)
-                        romData[byteToUse + 4] = (byte)(r1.Next() % 16);
+                    romData[byteToUse + 4] = (byte)(2 + (r1.Next() % 19));
+                    if (lnI == 38) romData[byteToUse + 4] *= 3;
                 }
                 else
                     for (int lnJ = 0; lnJ < 8; lnJ++)
