@@ -278,12 +278,12 @@ namespace DQ12SFCRando
 
         private void randomizeMonsterZones(Random r1)
         {
-            for (int lnI = 0; lnI < 19; lnI++)
+            for (int lnI = 0; lnI < 20; lnI++)
             {
                 for (int lnJ = 0; lnJ < 5; lnJ++)
                 {
                     int byteToUse = 0x5b52d + (lnI * 5) + lnJ;
-                    int min = (lnI >= 16 ? 30 : 1);
+                    int min = (lnI == 16 || lnI == 17 || lnI == 18 ? 30 : 1);
                     int max = (lnI == 0 ? 5 : lnI == 1 ? 10 : lnI == 2 ? 15 : 38);
 
                     romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min);
