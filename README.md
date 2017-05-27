@@ -14,4 +14,4 @@
 
 ## Special Thanks
 - Mcgrew, for his Dragon Warrior 1 Randomizer(https://github.com/mcgrew/dwrandomizer), giving me the inspiration to create this randomizer.  Twitch:  http://www.twitch.tv/mcgrew
-- StarOfViolence (Twitch:  https://www.twitch.tv/starofviolence) and Aether (Twitch:  https://twitch.tv/AetherTA) for testing.
+- StarOfViolence (twitch.tv/starofviolence) and Aether (twitch.tv/AetherTA) for testing.
