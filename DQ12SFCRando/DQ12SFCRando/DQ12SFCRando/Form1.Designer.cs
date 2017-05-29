@@ -62,6 +62,9 @@
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.cmdRandomize = new System.Windows.Forms.Button();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.chkSmallMap = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trkExperience)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkGoldReq)).BeginInit();
             this.SuspendLayout();
@@ -315,7 +318,7 @@
             // 
             // trkExperience
             // 
-            this.trkExperience.Location = new System.Drawing.Point(224, 294);
+            this.trkExperience.Location = new System.Drawing.Point(224, 323);
             this.trkExperience.Maximum = 50;
             this.trkExperience.Minimum = 5;
             this.trkExperience.Name = "trkExperience";
@@ -327,7 +330,7 @@
             // 
             // trkGoldReq
             // 
-            this.trkGoldReq.Location = new System.Drawing.Point(224, 317);
+            this.trkGoldReq.Location = new System.Drawing.Point(224, 346);
             this.trkGoldReq.Maximum = 50;
             this.trkGoldReq.Minimum = 10;
             this.trkGoldReq.Name = "trkGoldReq";
@@ -340,7 +343,7 @@
             // lblExperience
             // 
             this.lblExperience.AutoSize = true;
-            this.lblExperience.Location = new System.Drawing.Point(393, 295);
+            this.lblExperience.Location = new System.Drawing.Point(393, 324);
             this.lblExperience.Name = "lblExperience";
             this.lblExperience.Size = new System.Drawing.Size(33, 13);
             this.lblExperience.TabIndex = 78;
@@ -349,7 +352,7 @@
             // lblGoldReq
             // 
             this.lblGoldReq.AutoSize = true;
-            this.lblGoldReq.Location = new System.Drawing.Point(393, 318);
+            this.lblGoldReq.Location = new System.Drawing.Point(393, 347);
             this.lblGoldReq.Name = "lblGoldReq";
             this.lblGoldReq.Size = new System.Drawing.Size(33, 13);
             this.lblGoldReq.TabIndex = 79;
@@ -358,7 +361,7 @@
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(10, 355);
+            this.lblStatus.Location = new System.Drawing.Point(10, 384);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(0, 13);
             this.lblStatus.TabIndex = 80;
@@ -366,7 +369,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(28, 295);
+            this.label8.Location = new System.Drawing.Point(28, 324);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(110, 13);
             this.label8.TabIndex = 82;
@@ -375,7 +378,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(28, 318);
+            this.label9.Location = new System.Drawing.Point(28, 347);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(153, 13);
             this.label9.TabIndex = 83;
@@ -383,7 +386,7 @@
             // 
             // cmdRandomize
             // 
-            this.cmdRandomize.Location = new System.Drawing.Point(458, 313);
+            this.cmdRandomize.Location = new System.Drawing.Point(458, 342);
             this.cmdRandomize.Name = "cmdRandomize";
             this.cmdRandomize.Size = new System.Drawing.Size(75, 23);
             this.cmdRandomize.TabIndex = 84;
@@ -391,11 +394,46 @@
             this.cmdRandomize.UseVisualStyleBackColor = true;
             this.cmdRandomize.Click += new System.EventHandler(this.cmdRandomize_Click);
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Enabled = false;
+            this.checkBox1.Location = new System.Drawing.Point(233, 294);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(15, 14);
+            this.checkBox1.TabIndex = 86;
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Enabled = false;
+            this.checkBox2.Location = new System.Drawing.Point(12, 294);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(103, 17);
+            this.checkBox2.TabIndex = 85;
+            this.checkBox2.Text = "Randomize Map";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            // 
+            // chkSmallMap
+            // 
+            this.chkSmallMap.AutoSize = true;
+            this.chkSmallMap.Enabled = false;
+            this.chkSmallMap.Location = new System.Drawing.Point(274, 294);
+            this.chkSmallMap.Name = "chkSmallMap";
+            this.chkSmallMap.Size = new System.Drawing.Size(110, 17);
+            this.chkSmallMap.TabIndex = 87;
+            this.chkSmallMap.Text = "Small map in DQ2";
+            this.chkSmallMap.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(603, 382);
+            this.ClientSize = new System.Drawing.Size(603, 414);
+            this.Controls.Add(this.chkSmallMap);
+            this.Controls.Add(this.checkBox1);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.cmdRandomize);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.label8);
@@ -477,6 +515,9 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button cmdRandomize;
+        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox chkSmallMap;
     }
 }
 
