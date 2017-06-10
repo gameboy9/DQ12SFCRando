@@ -17,11 +17,20 @@ namespace DQ12SFCRando
         bool loading = true;
         byte[] romData;
         byte[] romData2;
-        int[,] map = new int[256, 256];
-        int[,] island = new int[256, 256];
-        int[,] zone = new int[16, 16];
-        int[] maxIsland = new int[4];
+
+        int game = 1;
+
+        int[,] map = new int[128, 128];
+        int[,] island = new int[128, 128];
+        int[,] zone = new int[8, 8];
+        int maxIsland;
         List<int> islands = new List<int>();
+
+        int[,] map2 = new int[256, 256];
+        int[,] island2 = new int[256, 256];
+        int[,] zone2 = new int[16, 16];
+        int[] maxIsland2 = new int[4];
+        List<int> islands2 = new List<int>();
 
         public Form1()
         {
@@ -253,7 +262,8 @@ namespace DQ12SFCRando
                 boostExp();
                 goldRequirements(r1);
                 saveRom();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error:  " + ex.Message);
             }
@@ -290,6 +300,297 @@ namespace DQ12SFCRando
             romData[0xd875c] = 0x26;
         }
 
+        private bool randomizeMapDQ1(Random r1)
+        {
+            for (int lnI = 0; lnI < 128; lnI++)
+                for (int lnJ = 0; lnJ < 128; lnJ++)
+                {
+                        map[lnI, lnJ] = 0x07;
+                        island[lnI, lnJ] = -1;
+                }
+
+            int islandSize = (r1.Next() % 5000) + 7500; // (lnI == 0 ? 1500 : lnI == 1 ? 2500 : lnI == 2 ? 1500 : lnI == 3 ? 1500 : lnI == 4 ? 5000 : 5000);
+
+            // Set up three special zones.  Zone 1000 = 25 squares and has Cannock stuff.  Zone 2000 = 30 squares and has Moonbrooke stuff.  
+            // Zone 3000 = 48 squares and has Hargon stuff.  It will be surrounded by eight tiles of mountains.
+            // This takes up 94 / 256 of the total squares available.
+
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                    zone[i, j] = 0;
+
+            generateZoneMap(0, false, islandSize, r1);
+            createBridges(r1);
+            resetIslands();
+
+            // We should mark islands and inaccessible land...
+            int lakeNumber = 256;
+
+            int maxPlots = 0;
+            int maxLake = 0;
+            for (int lnI = 0; lnI < 128; lnI++)
+                for (int lnJ = 0; lnJ < 128; lnJ++)
+                {
+                    if (island2[lnI, lnJ] == -1)
+                    {
+                        int plots = lakePlot(lakeNumber, lnI, lnJ);
+                        if (plots > maxPlots)
+                        {
+                            maxPlots = plots;
+                            maxLake = lakeNumber;
+                        }
+                        lakeNumber++;
+                    }
+                }
+
+            // Establish Tantegel location
+            bool midenOK = false;
+            int midenX = 0;
+            int midenY = 0;
+            while (!midenOK)
+            {
+                midenX = r1.Next() % 124;
+                midenY = r1.Next() % 124;
+                if (validPlot(midenY, midenX, 2, 2, new int[] { maxIsland }))
+                    midenOK = true;
+            }
+
+            bool tokenLegal = false;
+            while (!tokenLegal)
+            {
+                int x = r1.Next() % 122;
+                int y = r1.Next() % 122;
+                if (validPlot(y, x, 5, 5, islands.ToArray()) && reachable(y, x, true, midenX, midenY, maxLake))
+                {
+                    map2[y + 1, x + 1] = 0x01;
+                    map2[y + 1, x + 2] = 0x01;
+                    map2[y + 1, x + 3] = 0x01;
+                    map2[y + 2, x + 1] = 0x01;
+                    map2[y + 2, x + 2] = 0x30;
+                    map2[y + 2, x + 3] = 0x01;
+                    map2[y + 3, x + 1] = 0x01;
+                    map2[y + 3, x + 2] = 0x30;
+                    map2[y + 3, x + 3] = 0x01;
+                    // TODO:  Also need to update the ROM to indicate the token location.
+                    romData[0x19f20] = (byte)(x + 2);
+                    romData[0x19f21] = (byte)(y + 2);
+
+                    tokenLegal = true;
+                }
+            }
+
+            bool charlockLegal = false;
+            while (!charlockLegal)
+            {
+                int x = r1.Next() % 115;
+                int y = r1.Next() % 115;
+                if (validPlot(y, x, 11, 11, islands.ToArray()) && reachable(y, x, true, midenX, midenY, maxLake))
+                {
+                    map2[y + 1, x + 1] = 0x01;
+                    map2[y + 1, x + 2] = 0x01;
+                    map2[y + 1, x + 3] = 0x01;
+                    map2[y + 1, x + 4] = 0x01;
+                    map2[y + 1, x + 5] = 0x01;
+                    map2[y + 5, x + 1] = 0x01;
+                    map2[y + 5, x + 2] = 0x01;
+                    map2[y + 5, x + 3] = 0x01;
+                    map2[y + 5, x + 4] = 0x01;
+                    map2[y + 5, x + 5] = 0x01;
+                    map2[y + 2, x + 1] = 0x01;
+                    map2[y + 2, x + 5] = 0x01;
+                    map2[y + 3, x + 1] = 0x01;
+                    map2[y + 3, x + 5] = 0x07;
+                    map2[y + 4, x + 1] = 0x01;
+                    map2[y + 4, x + 5] = 0x01;
+                    map2[y + 2, x + 2] = 0xc2;
+                    map2[y + 2, x + 3] = 0xc3;
+                    map2[y + 3, x + 2] = 0xf6;
+                    map2[y + 3, x + 3] = 0xf7;
+                    map2[y + 4, x + 2] = 0xfe;
+                    map2[y + 4, x + 3] = 0xff;
+
+                    // TODO:  Also need to update the ROM to indicate Charlock's location and the rainbow drop bridge.
+                    //romData[0x19f20] = (byte)(x + 2);
+                    //romData[0x19f21] = (byte)(y + 2);
+
+                    charlockLegal = true;
+                }
+            }
+
+            // We'll place all of the castles now.
+            // Midenhall can go anywhere.  But Cannock has to be 15-30 squares or less away from there.
+            // Don't place Hargon's Castle for now.  OK, place it for now.  But I may change my mind later.
+            for (int lnI = 0; lnI < 7; lnI++)
+            {
+                int x = 300;
+                int y = 300;
+                if (lnI == 0) { x = midenX; y = midenY; }
+                else
+                {
+                    x = r1.Next() % 125;
+                    y = r1.Next() % 125;
+                }
+
+                if (validPlot(y, x, 2, 2, new int[] { maxIsland }) && reachable(y, x, false, midenX, midenY, maxLake))
+                {
+                    map[y + 0, x + 0] = 0xd8;
+                    map[y + 0, x + 1] = 0xd9;
+                    map[y + 1, x + 0] = 0xe0;
+                    map[y + 1, x + 1] = 0xe1;
+
+                    // TODO:  Map warp data
+                    int byteToUse = 0xa2b3;
+                    romData[byteToUse] = (byte)(x + 1);
+                    romData[byteToUse + 1] = (byte)(y + 1);
+
+                    // TODO:  Return points
+                    int byteMultiplier = lnI - (lnI >= 3 ? 1 : 0);
+                    romData[0xa27a + (3 * byteMultiplier)] = (byte)x;
+                    if (map2[y + 2, x] == 0x04)
+                        romData[0xa27a + (3 * byteMultiplier) + 1] = (byte)(y + 2);
+                    else
+                        romData[0xa27a + (3 * byteMultiplier) + 1] = (byte)(y + 1);
+                }
+                else
+                    lnI--;
+            }
+
+            // Now we'll place all of the towns now, including Hauksness.  They should all be villages?
+            for (int lnI = 0; lnI < 6; lnI++)
+            {
+                //if (lnI == 6) lnI = lnI;
+                int x = r1.Next() % 125;
+                int y = r1.Next() % 125;
+
+                if (validPlot(y, x, 1, 2, new int[] { maxIsland } ) && reachable(y, x, false, midenX, midenY, maxLake))
+                {
+                    map2[y, x + 0] = 0xda;
+                    map2[y, x + 1] = 0xdb;
+
+                    // TODO:  Location information
+                    int byteToUse2 = (lnI == 0 ? 0xa292 : lnI == 1 ? 0xa298 : lnI == 2 ? 0xa29e : lnI == 3 ? 0xa2a7 : lnI == 4 ? 0xa2aa : lnI == 5 ? 0xa2ad : 0xa2b0);
+                    romData[byteToUse2] = (byte)(x + 1);
+                    romData[byteToUse2 + 1] = (byte)(y);
+                }
+                else
+                    lnI--;
+            }
+
+            // Then the monoliths.
+            // All of these can go anywhere.
+            for (int lnI = 0; lnI < 2; lnI++)
+            {
+                if ((lnI == 0) && chkSmallMap.Checked) continue; // Remove the Midenhall Island shrine which is of no importance.
+                // lnI == 1 is probably the Cannock shrine... want to put that in Zone 1...
+
+                int x = r1.Next() % 125;
+                int y = r1.Next() % 125;
+
+                if (validPlot(y, x, 1, 1, new int[] { maxIsland }) && reachable(y, x, false, midenX, midenY, maxLake))
+                {
+                    map2[y, x] = 0x1d;
+
+                    // TODO:  Location information
+                    int byteToUse2 = 0xa2b6 + (lnI * 3); // (lnI < 11 ? 0xa2b6 + (lnI * 3) : 0xa2da);
+                    romData[byteToUse2] = (byte)(x);
+                    romData[byteToUse2 + 1] = (byte)(y);
+                }
+                else
+                    lnI--;
+            }
+
+            // TODO:  Send Erdrick's cave location warp into some water somewhere.
+
+            // Then the caves.
+            for (int lnI = 0; lnI < 3; lnI++)
+            {
+                int x = 300;
+                int y = 300;
+                x = r1.Next() % 125;
+                y = r1.Next() % 125;
+
+                if (validPlot(y, x, 1, 1, new int[] { maxIsland }) && reachable(y, x, false, midenX, midenY, maxLake))
+                {
+                    map2[y, x] = 0x11;
+
+                    // TODO:  Location information
+                    int byteToUse2 = (lnI == 0 ? 0xa2dd : lnI == 1 ? 0xa2e0 : lnI == 2 ? 0xa2e3 : lnI == 3 ? 0xa2ef : lnI == 4 ? 0xa2fb : lnI == 5 ? 0xa2fe : lnI == 6 ? 0xa304 : lnI == 7 ? 0xa307 : 0xa30a);
+                    romData[byteToUse2] = (byte)x;
+                    romData[byteToUse2 + 1] = (byte)(y);
+                }
+                else
+                    lnI--;
+            }
+
+            int[,] monsterZones = new int[8, 8];
+            for (int lnI = 0; lnI < 8; lnI++)
+                for (int lnJ = 0; lnJ < 8; lnJ++)
+                    monsterZones[lnI, lnJ] = 0xff;
+
+            int midenMZX = midenX / 8;
+            int midenMZY = midenY / 8;
+
+            // TODO:  Monster Zones could start at 1, not 0.  Also, want to mark zone 2 for left and north of Tantegel, and zone 3 for south and east of Tantegel.
+            // ALSO:  Consider moving the monster zones to a new region in the ROM, because I think that bank has space it can use.  HOWEVER, consider DW2 before doing this...
+            for (int mzX = 0; mzX < 8; mzX++)
+                for (int mzY = 0; mzY < 8; mzY++)
+                {
+                    if (mzX == midenMZX && mzY == midenMZY)
+                        monsterZones[midenMZY, midenMZX] = 0x00;
+                    else
+                        monsterZones[mzY, mzX] = r1.Next() % 17 + 0x2;
+                }
+
+            // Now let's enter all of this into the ROM...
+            // TODO:  Map information
+            int lnPointer = 0x9f97;
+
+            for (int lnI = 0; lnI <= 256; lnI++) // <---- There is a final pointer for lnI = 256, probably indicating the conclusion of the map.
+            {
+                romData[0xdda5 + (lnI * 2)] = (byte)(lnPointer % 256);
+                romData[0xdda6 + (lnI * 2)] = (byte)(lnPointer / 256);
+
+                int lnJ = 0;
+                while (lnI < 256 && lnJ < 256)
+                {
+                    if (map2[lnI, lnJ] >= 1 && map2[lnI, lnJ] <= 7)
+                    {
+                        int tileNumber = 0;
+                        int numberToMatch = map2[lnI, lnJ];
+                        while (lnJ < 256 && tileNumber < 32 && map2[lnI, lnJ] == numberToMatch && tileNumber < 32)
+                        {
+                            tileNumber++;
+                            lnJ++;
+                        }
+                        romData[lnPointer + 0x4010] = (byte)((0x20 * numberToMatch) + (tileNumber - 1));
+                        lnPointer++;
+                    }
+                    else
+                    {
+                        romData[lnPointer + 0x4010] = (byte)map2[lnI, lnJ];
+                        lnPointer++;
+                        lnJ++;
+                    }
+                }
+            }
+            //lnPointer = lnPointer;
+            if (lnPointer >= 0xb8f7)
+            {
+                MessageBox.Show("WARNING:  The map might have taken too much ROM space...");
+                // Might have to compress further to remove one byte stuff
+                // Must compress the map by getting rid of further 1 byte lakes
+            }
+
+            // TODO:  Enter monster zones
+            for (int lnI = 0; lnI < 8; lnI++)
+                for (int lnJ = 0; lnJ < 8; lnJ++)
+                {
+                    romData[0x103d6 + (lnI * 16) + lnJ] = (byte)monsterZones[lnI, lnJ];
+                }
+
+            return true;
+        }
+
         private bool randomizeMapv5(Random r1)
         {
             for (int lnI = 0; lnI < 256; lnI++)
@@ -297,13 +598,13 @@ namespace DQ12SFCRando
                 {
                     if (chkSmallMap.Checked && (lnI >= 128 || lnJ >= 128))
                     {
-                        map[lnI, lnJ] = 0x05;
-                        island[lnI, lnJ] = 200;
+                        map2[lnI, lnJ] = 0x05;
+                        island2[lnI, lnJ] = 200;
                     }
                     else
                     {
-                        map[lnI, lnJ] = 0x04;
-                        island[lnI, lnJ] = -1;
+                        map2[lnI, lnJ] = 0x04;
+                        island2[lnI, lnJ] = -1;
                     }
                 }
 
@@ -317,7 +618,7 @@ namespace DQ12SFCRando
             bool zonesCreated = false;
             while (!zonesCreated)
             {
-                zone = new int[16, 16];
+                zone2 = new int[16, 16];
                 if (createZone(3000, 48, true, r1) && createZone(1000, 25, false, r1) && createZone(2000, 32, false, r1))
                     zonesCreated = true;
             }
@@ -339,7 +640,7 @@ namespace DQ12SFCRando
             for (int lnI = 0; lnI < 256; lnI++)
                 for (int lnJ = 0; lnJ < 256; lnJ++)
                 {
-                    if (island[lnI, lnJ] == -1)
+                    if (island2[lnI, lnJ] == -1)
                     {
                         int plots = lakePlot(lakeNumber, lnI, lnJ);
                         if (plots > maxPlots)
@@ -359,7 +660,7 @@ namespace DQ12SFCRando
             {
                 midenX[1] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
                 midenY[1] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(midenY[1], midenX[1], 2, 2, new int[] { maxIsland[1] }))
+                if (validPlot(midenY[1], midenX[1], 2, 2, new int[] { maxIsland2[1] }))
                     midenOK = true;
             }
 
@@ -369,7 +670,7 @@ namespace DQ12SFCRando
             {
                 midenX[2] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
                 midenY[2] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(midenY[2], midenX[2], 1, 1, new int[] { maxIsland[2] }))
+                if (validPlot(midenY[2], midenX[2], 1, 1, new int[] { maxIsland2[2] }))
                     midenOK = true;
             }
 
@@ -379,7 +680,7 @@ namespace DQ12SFCRando
             {
                 midenX[3] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
                 midenY[3] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(midenY[3], midenX[3], 1, 1, new int[] { maxIsland[3] }))
+                if (validPlot(midenY[3], midenX[3], 1, 1, new int[] { maxIsland2[3] }))
                     midenOK = true;
             }
 
@@ -389,30 +690,30 @@ namespace DQ12SFCRando
             {
                 midenX[0] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
                 midenY[0] = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(midenY[0], midenX[0], 1, 1, new int[] { maxIsland[0] }))
+                if (validPlot(midenY[0], midenX[0], 1, 1, new int[] { maxIsland2[0] }))
                     midenOK = true;
             }
 
-            islands.Remove(maxIsland[1]);
-            islands.Remove(maxIsland[2]);
-            islands.Remove(maxIsland[3]);
+            islands2.Remove(maxIsland2[1]);
+            islands2.Remove(maxIsland2[2]);
+            islands2.Remove(maxIsland2[3]);
 
             bool treeLegal = false;
             while (!treeLegal)
             {
                 int x = r1.Next() % (chkSmallMap.Checked ? 121 : 249);
                 int y = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(y, x, 5, 5, islands.ToArray()) && reachable(y, x, true, midenX[1], midenY[1], maxLake))
+                if (validPlot(y, x, 5, 5, islands2.ToArray()) && reachable(y, x, true, midenX[1], midenY[1], maxLake))
                 {
-                    map[y + 1, x + 1] = 0x05;
-                    map[y + 1, x + 2] = 0x05;
-                    map[y + 1, x + 3] = 0x05;
-                    map[y + 2, x + 1] = 0x05;
-                    map[y + 2, x + 2] = 0x03;
-                    map[y + 2, x + 3] = 0x05;
-                    map[y + 3, x + 1] = 0x05;
-                    map[y + 3, x + 2] = 0x03;
-                    map[y + 3, x + 3] = 0x05;
+                    map2[y + 1, x + 1] = 0x05;
+                    map2[y + 1, x + 2] = 0x05;
+                    map2[y + 1, x + 3] = 0x05;
+                    map2[y + 2, x + 1] = 0x05;
+                    map2[y + 2, x + 2] = 0x03;
+                    map2[y + 2, x + 3] = 0x05;
+                    map2[y + 3, x + 1] = 0x05;
+                    map2[y + 3, x + 2] = 0x03;
+                    map2[y + 3, x + 3] = 0x05;
                     // Also need to update the ROM to indicate the World Tree location.
                     romData[0x19f20] = (byte)(x + 2);
                     romData[0x19f21] = (byte)(y + 2);
@@ -426,17 +727,17 @@ namespace DQ12SFCRando
             {
                 int x = r1.Next() % (chkSmallMap.Checked ? 121 : 249);
                 int y = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(y, x, 5, 5, islands.ToArray()) && reachable(y, x, true, midenX[1], midenY[1], maxLake))
+                if (validPlot(y, x, 5, 5, islands2.ToArray()) && reachable(y, x, true, midenX[1], midenY[1], maxLake))
                 {
-                    map[y + 1, x + 1] = 0x13;
-                    map[y + 1, x + 2] = 0x13;
-                    map[y + 1, x + 3] = 0x13;
-                    map[y + 2, x + 1] = 0x13;
-                    map[y + 2, x + 2] = 0x03;
-                    map[y + 2, x + 3] = 0x13;
-                    map[y + 3, x + 1] = 0x13;
-                    map[y + 3, x + 2] = 0x03;
-                    map[y + 3, x + 3] = 0x13;
+                    map2[y + 1, x + 1] = 0x13;
+                    map2[y + 1, x + 2] = 0x13;
+                    map2[y + 1, x + 3] = 0x13;
+                    map2[y + 2, x + 1] = 0x13;
+                    map2[y + 2, x + 2] = 0x03;
+                    map2[y + 2, x + 3] = 0x13;
+                    map2[y + 3, x + 1] = 0x13;
+                    map2[y + 3, x + 2] = 0x03;
+                    map2[y + 3, x + 3] = 0x13;
                     // Also need to update the ROM to indicate the World Tree location.
                     romData[0x19f1c] = (byte)(x + 2);
                     romData[0x19f1d] = (byte)(y + 2);
@@ -451,15 +752,15 @@ namespace DQ12SFCRando
             {
                 int x = r1.Next() % (chkSmallMap.Checked ? 121 : 249);
                 int y = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
-                if (validPlot(y, x, 5, 6, new int[] { maxIsland[2] }) && reachable(y, x, false, midenX[2], midenY[2], maxLake))
+                if (validPlot(y, x, 5, 6, new int[] { maxIsland2[2] }) && reachable(y, x, false, midenX[2], midenY[2], maxLake))
                 {
                     for (int lnJ = 1; lnJ < 4; lnJ++)
                         for (int lnK = 1; lnK < 5; lnK++)
                         {
                             if (lnJ == 1 || lnK == 1 || lnK == 4)
-                                map[y + lnJ, x + lnK] = 0x13;
+                                map2[y + lnJ, x + lnK] = 0x13;
                             else
-                                map[y + lnJ, x + lnK] = 0x08;
+                                map2[y + lnJ, x + lnK] = 0x08;
                         }
                     // Also need to update the ROM to indicate the new Mirror Of Ra search spot.
                     romData[0x19f18] = (byte)(x + 2);
@@ -483,13 +784,13 @@ namespace DQ12SFCRando
                     y = r1.Next() % (chkSmallMap.Checked ? 125 : 253);
                 }
 
-                if (validPlot(y, x, 2, 2, (lnI == 0 || lnI == 1 ? new int[] { maxIsland[1] } : lnI == 6 ? new int[] { maxIsland[3] } : islands.ToArray())) && reachable(y, x, (lnI != 0 && lnI != 1),
+                if (validPlot(y, x, 2, 2, (lnI == 0 || lnI == 1 ? new int[] { maxIsland2[1] } : lnI == 6 ? new int[] { maxIsland2[3] } : islands2.ToArray())) && reachable(y, x, (lnI != 0 && lnI != 1),
                     lnI == 6 ? midenX[3] : midenX[1], lnI == 6 ? midenY[3] : midenY[1], maxLake))
                 {
-                    map[y + 0, x + 0] = 0x00;
-                    map[y + 0, x + 1] = 0x12;
-                    map[y + 1, x + 0] = 0x10;
-                    map[y + 1, x + 1] = 0x11;
+                    map2[y + 0, x + 0] = 0x00;
+                    map2[y + 0, x + 1] = 0x12;
+                    map2[y + 1, x + 0] = 0x10;
+                    map2[y + 1, x + 1] = 0x11;
 
                     int byteToUse = (lnI == 0 ? 0xa28f : lnI == 1 ? 0xa295 : lnI == 2 ? 0xa29b : lnI == 3 ? 0xa2a1 : lnI == 4 ? 0xa2a4 : lnI == 5 ? 0xa2e9 : 0xa2b3);
                     romData[byteToUse] = (byte)(x + 1);
@@ -526,7 +827,7 @@ namespace DQ12SFCRando
                     {
                         int byteMultiplier = lnI - (lnI >= 3 ? 1 : 0);
                         romData[0xa27a + (3 * byteMultiplier)] = (byte)x;
-                        if (map[y + 2, x] == 0x04)
+                        if (map2[y + 2, x] == 0x04)
                             romData[0xa27a + (3 * byteMultiplier) + 1] = (byte)(y + 2);
                         else
                             romData[0xa27a + (3 * byteMultiplier) + 1] = (byte)(y + 1);
@@ -545,11 +846,11 @@ namespace DQ12SFCRando
                 int x = r1.Next() % (chkSmallMap.Checked ? 125 : 253);
                 int y = r1.Next() % (chkSmallMap.Checked ? 125 : 253);
 
-                if (validPlot(y, x, 1, 2, (lnI == 0 ? new int[] { maxIsland[1] } : lnI == 1 ? new int[] { maxIsland[2] } : lnI == 2 ? new int[] { maxIsland[0] } : islands.ToArray()))
+                if (validPlot(y, x, 1, 2, (lnI == 0 ? new int[] { maxIsland2[1] } : lnI == 1 ? new int[] { maxIsland2[2] } : lnI == 2 ? new int[] { maxIsland2[0] } : islands2.ToArray()))
                     && reachable(y, x, (lnI != 0 && lnI != 1 && lnI != 2), (lnI == 1 ? midenX[2] : lnI == 2 ? midenX[0] : midenX[1]), (lnI == 1 ? midenY[2] : lnI == 2 ? midenY[0] : midenY[1]), maxLake))
                 {
-                    map[y, x + 0] = 0x0e;
-                    map[y, x + 1] = 0x0f;
+                    map2[y, x + 0] = 0x0e;
+                    map2[y, x + 1] = 0x0f;
 
                     int byteToUse2 = (lnI == 0 ? 0xa292 : lnI == 1 ? 0xa298 : lnI == 2 ? 0xa29e : lnI == 3 ? 0xa2a7 : lnI == 4 ? 0xa2aa : lnI == 5 ? 0xa2ad : 0xa2b0);
                     romData[byteToUse2] = (byte)(x + 1);
@@ -564,7 +865,7 @@ namespace DQ12SFCRando
                     else if (lnI == 1)
                     {
                         romData[0xa27a + 18] = (byte)(x);
-                        if (map[y + 1, x] == 0x04)
+                        if (map2[y + 1, x] == 0x04)
                             romData[0xa27a + 19] = (byte)(y);
                         else
                             romData[0xa27a + 19] = (byte)(y + 1);
@@ -573,7 +874,7 @@ namespace DQ12SFCRando
                     else if (lnI == 6)
                     {
                         romData[0xa27a + 12] = (byte)(x);
-                        if (map[y + 1, x] == 0x04)
+                        if (map2[y + 1, x] == 0x04)
                             romData[0xa27a + 13] = (byte)(y);
                         else
                             romData[0xa27a + 13] = (byte)(y + 1);
@@ -606,11 +907,11 @@ namespace DQ12SFCRando
                     y = midenY[0];
                 }
 
-                if (validPlot(y, x, 1, 1, (lnI == 1 || lnI == 12 ? new int[] { maxIsland[1] } : lnI == 6 ? new int[] { maxIsland[3] } : lnI == 7 ? new int[] { maxIsland[0] } : lnI == 8 ? new int[] { maxIsland[2] } : islands.ToArray()))
+                if (validPlot(y, x, 1, 1, (lnI == 1 || lnI == 12 ? new int[] { maxIsland2[1] } : lnI == 6 ? new int[] { maxIsland2[3] } : lnI == 7 ? new int[] { maxIsland2[0] } : lnI == 8 ? new int[] { maxIsland2[2] } : islands2.ToArray()))
                     && reachable(y, x, (lnI != 1 && lnI != 12 && lnI != 8 && lnI != 7 && lnI != 6), lnI == 6 ? midenX[3] : lnI == 7 ? midenX[0] : lnI == 8 ? midenX[2] : midenX[1],
                     lnI == 6 ? midenY[3] : lnI == 7 ? midenY[0] : lnI == 8 ? midenY[2] : midenY[1], maxLake))
                 {
-                    map[y, x] = 0x0b;
+                    map2[y, x] = 0x0b;
 
                     int byteToUse2 = 0xa2b6 + (lnI * 3); // (lnI < 11 ? 0xa2b6 + (lnI * 3) : 0xa2da);
                     romData[byteToUse2] = (byte)(x);
@@ -620,7 +921,7 @@ namespace DQ12SFCRando
                     if (lnI == 6)
                     {
                         romData[0xa27a + 15] = (byte)(x);
-                        if (map[y + 1, x] == 0x04)
+                        if (map2[y + 1, x] == 0x04)
                             romData[0xa27a + 16] = (byte)(y);
                         else
                             romData[0xa27a + 16] = (byte)(y + 1);
@@ -647,11 +948,11 @@ namespace DQ12SFCRando
                     y = r1.Next() % (chkSmallMap.Checked ? 125 : 253);
                 }
 
-                if (validPlot(y, x, 1, 1, (lnI == 0 || lnI == 6 ? new int[] { maxIsland[2] } : lnI == 1 || lnI == 5 ? new int[] { maxIsland[1] } : lnI == 7 ? new int[] { maxIsland[3] } : islands.ToArray()))
+                if (validPlot(y, x, 1, 1, (lnI == 0 || lnI == 6 ? new int[] { maxIsland2[2] } : lnI == 1 || lnI == 5 ? new int[] { maxIsland2[1] } : lnI == 7 ? new int[] { maxIsland2[3] } : islands2.ToArray()))
                     && reachable(y, x, (lnI != 0 && lnI != 1 && lnI != 5 && lnI != 6 && lnI != 7),
                     lnI == 0 || lnI == 6 ? midenX[2] : lnI == 7 ? midenX[3] : midenX[1], lnI == 0 || lnI == 6 ? midenY[2] : lnI == 7 ? midenY[3] : midenY[1], maxLake))
                 {
-                    map[y, x] = 0x0c;
+                    map2[y, x] = 0x0c;
 
                     int byteToUse2 = (lnI == 0 ? 0xa2dd : lnI == 1 ? 0xa2e0 : lnI == 2 ? 0xa2e3 : lnI == 3 ? 0xa2ef : lnI == 4 ? 0xa2fb : lnI == 5 ? 0xa2fe : lnI == 6 ? 0xa304 : lnI == 7 ? 0xa307 : 0xa30a);
                     romData[byteToUse2] = (byte)x;
@@ -670,10 +971,10 @@ namespace DQ12SFCRando
                 int y = r1.Next() % (chkSmallMap.Checked ? 122 : 250);
 
                 // Need to make sure it's a valid 7x7 plot due to dropping with the Cloak of wind...
-                if (validPlot(y, x, 3, 3, (lnI == 0 ? new int[] { maxIsland[2] } : islands.ToArray()))
+                if (validPlot(y, x, 3, 3, (lnI == 0 ? new int[] { maxIsland2[2] } : islands2.ToArray()))
                     && reachable(y, x, (lnI != 0), lnI == 0 ? midenX[2] : midenX[1], lnI == 0 ? midenY[2] : midenY[1], maxLake))
                 {
-                    map[y + 3, x + 3] = 0x0a;
+                    map2[y + 3, x + 3] = 0x0a;
 
                     int byteToUse2 = (lnI == 0 ? 0xa2e6 : lnI == 1 ? 0xa2ec : lnI == 2 ? 0xa2f2 : lnI == 3 ? 0xa2f5 : 0xa2f8);
                     romData[byteToUse2] = (byte)(x + 3);
@@ -694,7 +995,7 @@ namespace DQ12SFCRando
             for (int mzX = 0; mzX < 16; mzX++)
                 for (int mzY = 0; mzY < 16; mzY++)
                 {
-                    if (zone[mzX, mzY] / 1000 == 1)
+                    if (zone2[mzX, mzY] / 1000 == 1)
                     {
                         if (Math.Abs(midenMZX - mzX) == 0 && Math.Abs(midenMZY - mzY) == 0)
                             monsterZones[mzY, mzX] = 0;
@@ -707,9 +1008,9 @@ namespace DQ12SFCRando
                         else
                             monsterZones[mzY, mzX] = r1.Next() % 18;
                     }
-                    else if (zone[mzX, mzY] / 1000 == 2)
+                    else if (zone2[mzX, mzY] / 1000 == 2)
                         monsterZones[mzY, mzX] = r1.Next() % 5 + 0x0d;
-                    else if (zone[mzX, mzY] / 1000 == 3)
+                    else if (zone2[mzX, mzY] / 1000 == 3)
                         monsterZones[mzY, mzX] = r1.Next() % 2 + 0x32;
                     else
                     {
@@ -733,11 +1034,11 @@ namespace DQ12SFCRando
                 int lnJ = 0;
                 while (lnI < 256 && lnJ < 256)
                 {
-                    if (map[lnI, lnJ] >= 1 && map[lnI, lnJ] <= 7)
+                    if (map2[lnI, lnJ] >= 1 && map2[lnI, lnJ] <= 7)
                     {
                         int tileNumber = 0;
-                        int numberToMatch = map[lnI, lnJ];
-                        while (lnJ < 256 && tileNumber < 32 && map[lnI, lnJ] == numberToMatch && tileNumber < 32)
+                        int numberToMatch = map2[lnI, lnJ];
+                        while (lnJ < 256 && tileNumber < 32 && map2[lnI, lnJ] == numberToMatch && tileNumber < 32)
                         {
                             tileNumber++;
                             lnJ++;
@@ -747,7 +1048,7 @@ namespace DQ12SFCRando
                     }
                     else
                     {
-                        romData[lnPointer + 0x4010] = (byte)map[lnI, lnJ];
+                        romData[lnPointer + 0x4010] = (byte)map2[lnI, lnJ];
                         lnPointer++;
                         lnJ++;
                     }
@@ -791,17 +1092,17 @@ namespace DQ12SFCRando
                 for (int y = 0; y < 16; y++)
                 {
                     // 1 = north, 2 = east, 4 = south, 8 = west
-                    if (y == 0) zone[x, y] += 1;
-                    else if (zone[x, y - 1] / 1000 != zone[x, y] / 1000) zone[x, y] += 1;
+                    if (y == 0) zone2[x, y] += 1;
+                    else if (zone2[x, y - 1] / 1000 != zone2[x, y] / 1000) zone2[x, y] += 1;
 
-                    if (x == 15) zone[x, y] += 2;
-                    else if (zone[x + 1, y] / 1000 != zone[x, y] / 1000) zone[x, y] += 2;
+                    if (x == 15) zone2[x, y] += 2;
+                    else if (zone2[x + 1, y] / 1000 != zone2[x, y] / 1000) zone2[x, y] += 2;
 
-                    if (y == 15) zone[x, y] += 4;
-                    else if (zone[x, y + 1] / 1000 != zone[x, y] / 1000) zone[x, y] += 4;
+                    if (y == 15) zone2[x, y] += 4;
+                    else if (zone2[x, y + 1] / 1000 != zone2[x, y] / 1000) zone2[x, y] += 4;
 
-                    if (x == 0) zone[x, y] += 8;
-                    else if (zone[x - 1, y] / 1000 != zone[x, y] / 1000) zone[x, y] += 8;
+                    if (x == 0) zone2[x, y] += 8;
+                    else if (zone2[x - 1, y] / 1000 != zone2[x, y] / 1000) zone2[x, y] += 8;
                 }
         }
 
@@ -810,10 +1111,10 @@ namespace DQ12SFCRando
             if (mountains)
                 for (int x = 0; x < 16; x++)
                     for (int y = 0; y < 16; y++)
-                        if (zone[x, y] / 1000 == zoneToUse / 1000 && zone[x, y] % 1000 > 0)
+                        if (zone2[x, y] / 1000 == zoneToUse / 1000 && zone2[x, y] % 1000 > 0)
                             for (int x2 = x * 8; x2 < (x * 8) + 8; x2++)
                                 for (int y2 = y * 8; y2 < (y * 8) + 8; y2++)
-                                    map[y2, x2] = 0x05;
+                                    map2[y2, x2] = 0x05;
 
             int[] terrainTypes = { 1, 1, 1, 2, 2, 7, 7, 5, 3, 3, 3, 6, 6, 6 };
 
@@ -850,17 +1151,17 @@ namespace DQ12SFCRando
                             //if (lnX <= 1 || lnY <= 1 || lnY >= 126 || lnY >= 126) continue;
 
                             int direction = (r1.Next() % 16);
-                            map[lnY, lnX] = terrainTypes[lnMarker];
-                            island[lnY, lnX] = zoneToUse;
+                            map2[lnY, lnX] = terrainTypes[lnMarker];
+                            island2[lnY, lnX] = zoneToUse;
                             // 1 = North, 2 = east, 4 = south, 8 = west
                             if (direction % 8 >= 4 && lnY <= 125)
                             {
                                 if (validPoint(lnX, lnY + 1, zoneToUse, mountains))
                                 {
-                                    if (map[lnY + 1, lnX] == 4)
+                                    if (map2[lnY + 1, lnX] == 4)
                                         totalLand++;
-                                    map[lnY + 1, lnX] = terrainTypes[lnMarker];
-                                    island[lnY + 1, lnX] = zoneToUse;
+                                    map2[lnY + 1, lnX] = terrainTypes[lnMarker];
+                                    island2[lnY + 1, lnX] = zoneToUse;
                                     newPoints.Add(lnX);
                                     newPoints.Add(lnY + 1);
                                 }
@@ -869,10 +1170,10 @@ namespace DQ12SFCRando
                             {
                                 if (validPoint(lnX, lnY - 1, zoneToUse, mountains))
                                 {
-                                    if (map[lnY - 1, lnX] == 4)
+                                    if (map2[lnY - 1, lnX] == 4)
                                         totalLand++;
-                                    map[lnY - 1, lnX] = terrainTypes[lnMarker];
-                                    island[lnY - 1, lnX] = zoneToUse;
+                                    map2[lnY - 1, lnX] = terrainTypes[lnMarker];
+                                    island2[lnY - 1, lnX] = zoneToUse;
                                     newPoints.Add(lnX);
                                     newPoints.Add(lnY - 1);
                                 }
@@ -881,10 +1182,10 @@ namespace DQ12SFCRando
                             {
                                 if (validPoint(lnX + 1, lnY, zoneToUse, mountains))
                                 {
-                                    if (map[lnY, lnX + 1] == 4)
+                                    if (map2[lnY, lnX + 1] == 4)
                                         totalLand++;
-                                    map[lnY, lnX + 1] = terrainTypes[lnMarker];
-                                    island[lnY, lnX + 1] = zoneToUse;
+                                    map2[lnY, lnX + 1] = terrainTypes[lnMarker];
+                                    island2[lnY, lnX + 1] = zoneToUse;
                                     newPoints.Add(lnX + 1);
                                     newPoints.Add(lnY);
                                 }
@@ -893,10 +1194,10 @@ namespace DQ12SFCRando
                             {
                                 if (validPoint(lnX - 1, lnY, zoneToUse, mountains))
                                 {
-                                    if (map[lnY, lnX - 1] == 4)
+                                    if (map2[lnY, lnX - 1] == 4)
                                         totalLand++;
-                                    map[lnY, lnX - 1] = terrainTypes[lnMarker];
-                                    island[lnY, lnX - 1] = zoneToUse;
+                                    map2[lnY, lnX - 1] = terrainTypes[lnMarker];
+                                    island2[lnY, lnX - 1] = zoneToUse;
                                     newPoints.Add(lnX - 1);
                                     newPoints.Add(lnY);
                                 }
@@ -916,16 +1217,16 @@ namespace DQ12SFCRando
             for (int lnY = 0; lnY < 128; lnY++)
                 for (int lnX = 0; lnX < 125; lnX++)
                 {
-                    if (island[lnY, lnX] == zoneToUse && island[lnY, lnX + 1] == zoneToUse && island[lnY, lnX + 2] == zoneToUse && island[lnY, lnX + 3] == zoneToUse)
+                    if (island2[lnY, lnX] == zoneToUse && island2[lnY, lnX + 1] == zoneToUse && island2[lnY, lnX + 2] == zoneToUse && island2[lnY, lnX + 3] == zoneToUse)
                     {
                         List<int> land = new List<int> { 1, 2, 3, 5, 6, 7 };
-                        if (map[lnY, lnX] == map[lnY, lnX + 2] && map[lnY, lnX] != map[lnY, lnX + 1]) { map[lnY, lnX + 1] = map[lnY, lnX]; island[lnY, lnX + 1] = island[lnY, lnX]; }
-                        if (lnX < 124 && land.Contains(map[lnY, lnX]) && !land.Contains(map[lnY, lnX + 1]) && !land.Contains(map[lnY, lnX + 2]) && land.Contains(map[lnY, lnX + 3]))
+                        if (map2[lnY, lnX] == map2[lnY, lnX + 2] && map2[lnY, lnX] != map2[lnY, lnX + 1]) { map2[lnY, lnX + 1] = map2[lnY, lnX]; island2[lnY, lnX + 1] = island2[lnY, lnX]; }
+                        if (lnX < 124 && land.Contains(map2[lnY, lnX]) && !land.Contains(map2[lnY, lnX + 1]) && !land.Contains(map2[lnY, lnX + 2]) && land.Contains(map2[lnY, lnX + 3]))
                         {
-                            map[lnY, lnX + 1] = map[lnY, lnX];
-                            map[lnY, lnX + 2] = map[lnY, lnX + 3];
-                            island[lnY, lnX + 1] = island[lnY, lnX];
-                            island[lnY, lnX + 2] = island[lnY, lnX + 3];
+                            map2[lnY, lnX + 1] = map2[lnY, lnX];
+                            map2[lnY, lnX + 2] = map2[lnY, lnX + 3];
+                            island2[lnY, lnX + 1] = island2[lnY, lnX];
+                            island2[lnY, lnX + 2] = island2[lnY, lnX + 3];
                         }
                     }
                 }
@@ -939,9 +1240,9 @@ namespace DQ12SFCRando
             // Establish zone
             int zoneX = x / 8;
             int zoneY = y / 8;
-            int zoneSides = zone[zoneX, zoneY] % 1000;
-            if (zone[zoneX, zoneY] % 1000 != 0 && mountains) return false;
-            if (zone[zoneX, zoneY] / 1000 != zoneToUse / 1000) return false;
+            int zoneSides = zone2[zoneX, zoneY] % 1000;
+            if (zone2[zoneX, zoneY] % 1000 != 0 && mountains) return false;
+            if (zone2[zoneX, zoneY] / 1000 != zoneToUse / 1000) return false;
             // 1 = north, 2 = east, 4 = south, 8 = west
             if (y % 8 == 0 && zoneSides % 2 == 1) return false;
             if (x % 8 == 7 && zoneSides % 4 >= 2) return false;
@@ -962,7 +1263,7 @@ namespace DQ12SFCRando
             for (int lnI = 0; lnI < 256; lnI++)
                 for (int lnJ = 0; lnJ < 256; lnJ++)
                 {
-                    if (island[lnI, lnJ] == zoneToUse && map[lnI, lnJ] != 0x05)
+                    if (island2[lnI, lnJ] == zoneToUse && map2[lnI, lnJ] != 0x05)
                     {
                         int plots = landPlot(landNumber, lnI, lnJ, zoneToUse);
                         if (plots > maxLandPlots)
@@ -971,14 +1272,14 @@ namespace DQ12SFCRando
                             maxLand = landNumber;
 
                         }
-                        islands.Add(landNumber);
+                        islands2.Add(landNumber);
                         landNumber++;
 
-                        lastIsland = island[lnI, lnJ];
+                        lastIsland = island2[lnI, lnJ];
                     }
                 }
 
-            maxIsland[zoneToUse / 1000] = maxLand;
+            maxIsland2[zoneToUse / 1000] = maxLand;
         }
 
         private void resetIslands()
@@ -986,14 +1287,14 @@ namespace DQ12SFCRando
             for (int y = 0; y < 256; y++)
                 for (int x = 0; x < 256; x++)
                 {
-                    if (island[y, x] != 200 && island[y, x] != -1)
+                    if (island2[y, x] != 200 && island2[y, x] != -1)
                     {
-                        island[y, x] /= 1000;
-                        island[y, x] *= 1000;
+                        island2[y, x] /= 1000;
+                        island2[y, x] *= 1000;
                     }
                 }
 
-            islands.Clear();
+            islands2.Clear();
 
             markIslands(3000);
             markIslands(1000);
@@ -1009,17 +1310,17 @@ namespace DQ12SFCRando
             for (int y = 1; y < 252; y++)
                 for (int x = 1; x < 252; x++)
                 {
-                    if (y == 78 && x == 3) map[y, x] = map[y, x];
-                    if (map[y, x] == 0x05 || map[y, x] == 0x04) continue;
+                    if (y == 78 && x == 3) map2[y, x] = map2[y, x];
+                    if (map2[y, x] == 0x05 || map2[y, x] == 0x04) continue;
 
                     for (int lnI = 2; lnI <= 4; lnI++)
                     {
-                        if (island[y, x] != island[y + lnI, x] && island[y, x] / 1000 == island[y + lnI, x] / 1000 && map[y + lnI, x] != 0x04 && map[y + lnI, x] != 0x05)
+                        if (island2[y, x] != island2[y + lnI, x] && island2[y, x] / 1000 == island2[y + lnI, x] / 1000 && map2[y + lnI, x] != 0x04 && map2[y + lnI, x] != 0x05)
                         {
                             bool fail = false;
                             for (int lnJ = 1; lnJ < lnI; lnJ++)
                             {
-                                if (map[y + lnJ, x] != 0x04)
+                                if (map2[y + lnJ, x] != 0x04)
                                 {
                                     fail = true;
                                     //map[y + lnJ, x - 1] = 0x04; map[y + lnJ, x + 1] = 0x04;
@@ -1032,18 +1333,18 @@ namespace DQ12SFCRando
                             }
                             if (!fail)
                             {
-                                bridgePossible.Add(new BridgeList(x, y, true, lnI, island[y, x], island[y + lnI, x]));
-                                if (islandPossible.Where(c => c.island1 == island[y, x] && c.island2 == island[y + lnI, x]).Count() == 0)
-                                    islandPossible.Add(new islandLinks(island[y, x], island[y + lnI, x]));
+                                bridgePossible.Add(new BridgeList(x, y, true, lnI, island2[y, x], island2[y + lnI, x]));
+                                if (islandPossible.Where(c => c.island1 == island2[y, x] && c.island2 == island2[y + lnI, x]).Count() == 0)
+                                    islandPossible.Add(new islandLinks(island2[y, x], island2[y + lnI, x]));
                             }
                         }
 
-                        if (island[y, x] != island[y, x + lnI] && island[y, x] / 1000 == island[y, x + lnI] / 1000 && map[y, x + lnI] != 0x04 && map[y, x + lnI] != 0x05)
+                        if (island2[y, x] != island2[y, x + lnI] && island2[y, x] / 1000 == island2[y, x + lnI] / 1000 && map2[y, x + lnI] != 0x04 && map2[y, x + lnI] != 0x05)
                         {
                             bool fail = false;
                             for (int lnJ = 1; lnJ < lnI; lnJ++)
                             {
-                                if (map[y, x + lnJ] != 0x04)
+                                if (map2[y, x + lnJ] != 0x04)
                                 {
                                     fail = true;
                                     //    map[y - 1, x + lnJ] = 0x04; map[y + 1, x + lnJ] = 0x04;
@@ -1057,9 +1358,9 @@ namespace DQ12SFCRando
                             }
                             if (!fail)
                             {
-                                bridgePossible.Add(new BridgeList(x, y, false, lnI, island[y, x], island[y, x + lnI]));
-                                if (islandPossible.Where(c => c.island1 == island[y, x] && c.island2 == island[y, x + lnI]).Count() == 0)
-                                    islandPossible.Add(new islandLinks(island[y, x], island[y, x + lnI]));
+                                bridgePossible.Add(new BridgeList(x, y, false, lnI, island2[y, x], island2[y, x + lnI]));
+                                if (islandPossible.Where(c => c.island1 == island2[y, x] && c.island2 == island2[y, x + lnI]).Count() == 0)
+                                    islandPossible.Add(new islandLinks(island2[y, x], island2[y, x + lnI]));
                             }
                         }
                     }
@@ -1078,15 +1379,15 @@ namespace DQ12SFCRando
                     // Choose one bridge out of the possibilities
                     BridgeList bridgeToBuild = test[r1.Next() % test.Count];
                     // Then confirm that the bridge is still possible...
-                    int bridgeTest = map[bridgeToBuild.y, bridgeToBuild.x];
-                    int bridgeTest2 = (bridgeToBuild.south ? map[bridgeToBuild.y + bridgeToBuild.distance, bridgeToBuild.x] : map[bridgeToBuild.y, bridgeToBuild.x + bridgeToBuild.distance]);
+                    int bridgeTest = map2[bridgeToBuild.y, bridgeToBuild.x];
+                    int bridgeTest2 = (bridgeToBuild.south ? map2[bridgeToBuild.y + bridgeToBuild.distance, bridgeToBuild.x] : map2[bridgeToBuild.y, bridgeToBuild.x + bridgeToBuild.distance]);
 
                     if (bridgeTest == 0x04 || bridgeTest == 0x0d || bridgeTest == 0x09 || bridgeTest2 == 0x04 || bridgeTest2 == 0x0d || bridgeTest2 == 0x09)
                         continue;
 
                     for (int lnI = 1; lnI <= bridgeToBuild.distance - 1; lnI++)
                     {
-                        int bridgeTest3 = (bridgeToBuild.south ? map[bridgeToBuild.y + lnI, bridgeToBuild.x] : map[bridgeToBuild.y, bridgeToBuild.x + lnI]);
+                        int bridgeTest3 = (bridgeToBuild.south ? map2[bridgeToBuild.y + lnI, bridgeToBuild.x] : map2[bridgeToBuild.y, bridgeToBuild.x + lnI]);
                         if (bridgeTest3 != 0x04)
                             continue;
                     }
@@ -1095,19 +1396,19 @@ namespace DQ12SFCRando
                     {
                         if (bridgeToBuild.south)
                         {
-                            map[bridgeToBuild.y + lnI, bridgeToBuild.x - 1] = 0x04; map[bridgeToBuild.y + lnI, bridgeToBuild.x + 1] = 0x04;
-                            island[bridgeToBuild.y + lnI, bridgeToBuild.x - 1] = 0x04; island[bridgeToBuild.y + lnI, bridgeToBuild.x + 1] = 0x04;
+                            map2[bridgeToBuild.y + lnI, bridgeToBuild.x - 1] = 0x04; map2[bridgeToBuild.y + lnI, bridgeToBuild.x + 1] = 0x04;
+                            island2[bridgeToBuild.y + lnI, bridgeToBuild.x - 1] = 0x04; island2[bridgeToBuild.y + lnI, bridgeToBuild.x + 1] = 0x04;
 
-                            map[bridgeToBuild.y + lnI, bridgeToBuild.x] = 0x0d;
-                            island[bridgeToBuild.y + lnI, bridgeToBuild.x] = bridgeToBuild.island1;
+                            map2[bridgeToBuild.y + lnI, bridgeToBuild.x] = 0x0d;
+                            island2[bridgeToBuild.y + lnI, bridgeToBuild.x] = bridgeToBuild.island1;
                         }
                         else
                         {
-                            map[bridgeToBuild.y - 1, bridgeToBuild.x + lnI] = 0x04; map[bridgeToBuild.y + 1, bridgeToBuild.x + lnI] = 0x04;
-                            island[bridgeToBuild.y - 1, bridgeToBuild.x + lnI] = 200; island[bridgeToBuild.y + 1, bridgeToBuild.x + lnI] = 200;
+                            map2[bridgeToBuild.y - 1, bridgeToBuild.x + lnI] = 0x04; map2[bridgeToBuild.y + 1, bridgeToBuild.x + lnI] = 0x04;
+                            island2[bridgeToBuild.y - 1, bridgeToBuild.x + lnI] = 200; island2[bridgeToBuild.y + 1, bridgeToBuild.x + lnI] = 200;
 
-                            map[bridgeToBuild.y, bridgeToBuild.x + lnI] = 0x09;
-                            island[bridgeToBuild.y, bridgeToBuild.x + lnI] = bridgeToBuild.island1;
+                            map2[bridgeToBuild.y, bridgeToBuild.x + lnI] = 0x09;
+                            island2[bridgeToBuild.y, bridgeToBuild.x + lnI] = bridgeToBuild.island1;
                         }
                     }
                     pass = true;
@@ -1153,14 +1454,14 @@ namespace DQ12SFCRando
                     int x = r1.Next() % 16;
                     int y = r1.Next() % 16;
                     int minX = x, maxX = x, minY = y, maxY = y;
-                    if (!firstZone && zone[x, y] != zoneNumber)
+                    if (!firstZone && zone2[x, y] != zoneNumber)
                     {
                         continue;
                     }
                     if (firstZone)
                     {
                         firstZone = false;
-                        zone[x, y] = zoneNumber;
+                        zone2[x, y] = zoneNumber;
                     }
 
                     tries--;
@@ -1173,30 +1474,30 @@ namespace DQ12SFCRando
                     if (totalDirections > size) continue;
 
                     // 1 = north, 2 = east, 4 = south, 8 = west
-                    if (direction % 16 >= 8 && x != 0 && zone[x - 1, y] == 0 && (minX <= (x - 1) || maxX - minX <= 11))
+                    if (direction % 16 >= 8 && x != 0 && zone2[x - 1, y] == 0 && (minX <= (x - 1) || maxX - minX <= 11))
                     {
-                        zone[x - 1, y] = zoneNumber;
+                        zone2[x - 1, y] = zoneNumber;
                         minX = (x - 1 < minX ? x - 1 : minX);
                         size--;
                         tries = 100;
                     }
-                    if (direction % 8 >= 4 && y != 15 && zone[x, y + 1] == 0 && (maxY >= (y + 1) || maxY - minY <= 11))
+                    if (direction % 8 >= 4 && y != 15 && zone2[x, y + 1] == 0 && (maxY >= (y + 1) || maxY - minY <= 11))
                     {
-                        zone[x, y + 1] = zoneNumber;
+                        zone2[x, y + 1] = zoneNumber;
                         maxY = (y + 1 > maxY ? y + 1 : maxY);
                         size--;
                         tries = 100;
                     }
-                    if (direction % 4 >= 2 && x != 15 && zone[x + 1, y] == 0 && (minX >= (x + 1) || maxX - minX <= 11))
+                    if (direction % 4 >= 2 && x != 15 && zone2[x + 1, y] == 0 && (minX >= (x + 1) || maxX - minX <= 11))
                     {
-                        zone[x + 1, y] = zoneNumber;
+                        zone2[x + 1, y] = zoneNumber;
                         maxX = (x + 1 > maxX ? x + 1 : maxX);
                         size--;
                         tries = 100;
                     }
-                    if (direction % 2 >= 1 && y != 0 && zone[x, y - 1] == 0 && (minY <= (y - 1) || maxY - minY <= 11))
+                    if (direction % 2 >= 1 && y != 0 && zone2[x, y - 1] == 0 && (minY <= (y - 1) || maxY - minY <= 11))
                     {
-                        zone[x, y - 1] = zoneNumber;
+                        zone2[x, y - 1] = zoneNumber;
                         minY = (y - 1 < minY ? y - 1 : minY);
                         size--;
                         tries = 100;
@@ -1217,7 +1518,7 @@ namespace DQ12SFCRando
 
                 for (int i = x; i < x + length; i++)
                     for (int j = y; j < y + width; j++)
-                        zone[i, j] = zoneNumber;
+                        zone2[i, j] = zoneNumber;
 
                 // Snow definition
                 romData[0x3e2b6] = (byte)(y * 8);
@@ -1268,7 +1569,7 @@ namespace DQ12SFCRando
                     int dirY = (dir == 1 ? y - 1 : dir == 3 ? y + 1 : y);
                     dirY = (dirY == 256 ? 0 : dirY == -1 ? 255 : dirY);
 
-                    if (validPlots.Contains(map[dirY, dirX]) && (map[dirY, dirX] != 4 || island[dirY, dirX] == maxLake))
+                    if (validPlots.Contains(map2[dirY, dirX]) && (map2[dirY, dirX] != 4 || island2[dirY, dirX] == maxLake))
                     {
                         if (dir != 0 && plotted[dirY, dirX] == false)
                         {
@@ -1303,7 +1604,7 @@ namespace DQ12SFCRando
                 else
                 {
                     if (fill)
-                        map[y, x] = (islandNumber == 0 ? 0x01 : islandNumber == 1 ? 0x06 : islandNumber == 2 ? 0x03 : islandNumber == 3 ? 0x02 : islandNumber == 4 ? 0x07 : 0x05);
+                        map2[y, x] = (islandNumber == 0 ? 0x01 : islandNumber == 1 ? 0x06 : islandNumber == 2 ? 0x03 : islandNumber == 3 ? 0x02 : islandNumber == 4 ? 0x07 : 0x05);
                     first = false;
                 }
 
@@ -1314,12 +1615,12 @@ namespace DQ12SFCRando
                     int dirY = (dir == 1 ? y - 1 : dir == 3 ? y + 1 : y);
                     dirY = (dirY == 256 ? 0 : dirY == -1 ? 255 : dirY);
 
-                    if (island[dirY, dirX] == -1 || (island[dirY, dirX] == lakeNumber && fill))
+                    if (island2[dirY, dirX] == -1 || (island2[dirY, dirX] == lakeNumber && fill))
                     {
                         plots++;
-                        island[dirY, dirX] = (fill ? islandNumber : lakeNumber);
+                        island2[dirY, dirX] = (fill ? islandNumber : lakeNumber);
                         if (fill)
-                            map[dirY, dirX] = (islandNumber == 0 ? 0x01 : islandNumber == 1 ? 0x06 : islandNumber == 2 ? 0x03 : islandNumber == 3 ? 0x02 : islandNumber == 4 ? 0x07 : 0x05);
+                            map2[dirY, dirX] = (islandNumber == 0 ? 0x01 : islandNumber == 1 ? 0x06 : islandNumber == 2 ? 0x03 : islandNumber == 3 ? 0x02 : islandNumber == 4 ? 0x07 : 0x05);
 
                         if (dir != 0)
                         {
@@ -1360,10 +1661,10 @@ namespace DQ12SFCRando
                     int dirY = (dir == 1 ? y - 1 : dir == 3 ? y + 1 : y);
                     dirY = (dirY == 256 ? 0 : dirY == -1 ? 255 : dirY);
 
-                    if (island[dirY, dirX] == zoneToUse)
+                    if (island2[dirY, dirX] == zoneToUse)
                     {
                         plots++;
-                        island[dirY, dirX] = landNumber;
+                        island2[dirY, dirX] = landNumber;
 
                         if (dir != 0)
                         {
@@ -1391,12 +1692,12 @@ namespace DQ12SFCRando
 
                     bool ok = false;
                     for (int lnK = 0; lnK < legalIsland.Length; lnK++)
-                        if (island[legalY, legalX] == legalIsland[lnK])
+                        if (island2[legalY, legalX] == legalIsland[lnK])
                             ok = true;
                     if (!ok) return false;
                     // map[legalY, legalX] == 0x04 || 
-                    if (map[legalY, legalX] == 0x00 || map[legalY, legalX] == 0x05 || map[legalY, legalX] == 0x0a || map[legalY, legalX] == 0x0b || map[legalY, legalX] == 0x0c ||
-                        map[legalY, legalX] == 0x0e || map[legalY, legalX] == 0x0f || map[legalY, legalX] == 0x10 || map[legalY, legalX] == 0x11 || map[legalY, legalX] == 0x12 || map[legalY, legalX] == 0x13)
+                    if (map2[legalY, legalX] == 0x00 || map2[legalY, legalX] == 0x05 || map2[legalY, legalX] == 0x0a || map2[legalY, legalX] == 0x0b || map2[legalY, legalX] == 0x0c ||
+                        map2[legalY, legalX] == 0x0e || map2[legalY, legalX] == 0x0f || map2[legalY, legalX] == 0x10 || map2[legalY, legalX] == 0x11 || map2[legalY, legalX] == 0x12 || map2[legalY, legalX] == 0x13)
                         return false;
                 }
             return true;
@@ -1417,7 +1718,7 @@ namespace DQ12SFCRando
                 lnK = left;
                 if (lnI == 0)
                 {
-                    while (island[lnJ, lnK] != maxLake && distance < 200)
+                    while (island2[lnJ, lnK] != maxLake && distance < 200)
                     {
                         distance++;
                         lnJ = (lnJ == 0 ? 255 : lnJ - 1);
@@ -1425,7 +1726,7 @@ namespace DQ12SFCRando
                 }
                 else if (lnI == 1)
                 {
-                    while (island[lnJ, lnK] != maxLake && distance < 200)
+                    while (island2[lnJ, lnK] != maxLake && distance < 200)
                     {
                         distance++;
                         lnJ = (lnJ == 255 ? 0 : lnJ + 1);
@@ -1433,7 +1734,7 @@ namespace DQ12SFCRando
                 }
                 else if (lnI == 2)
                 {
-                    while (island[lnJ, lnK] != maxLake && distance < 200)
+                    while (island2[lnJ, lnK] != maxLake && distance < 200)
                     {
                         distance++;
                         lnK = (lnK == 255 ? 0 : lnK + 1);
@@ -1441,7 +1742,7 @@ namespace DQ12SFCRando
                 }
                 else
                 {
-                    while (island[lnJ, lnK] != maxLake && distance < 200)
+                    while (island2[lnJ, lnK] != maxLake && distance < 200)
                     {
                         distance++;
                         lnK = (lnK == 0 ? 255 : lnK - 1);
@@ -1461,36 +1762,36 @@ namespace DQ12SFCRando
             if (minDirection == 0)
             {
                 lnJ = (finalY == 255 ? 0 : finalY + 1);
-                while (map[lnJ, finalX] == 0x05)
+                while (map2[lnJ, finalX] == 0x05)
                 {
-                    map[lnJ, finalX] = 0x07;
+                    map2[lnJ, finalX] = 0x07;
                     lnJ = (lnJ == 255 ? 0 : lnJ + 1);
                 }
             }
             else if (minDirection == 1)
             {
                 lnJ = (finalY == 0 ? 255 : finalY - 1);
-                while (map[lnJ, finalX] == 0x05)
+                while (map2[lnJ, finalX] == 0x05)
                 {
-                    map[lnJ, finalX] = 0x07;
+                    map2[lnJ, finalX] = 0x07;
                     lnJ = (lnJ == 0 ? 255 : lnJ - 1);
                 }
             }
             else if (minDirection == 2)
             {
                 lnK = (finalX == 0 ? 255 : finalX - 1);
-                while (map[finalY, lnK] == 0x05)
+                while (map2[finalY, lnK] == 0x05)
                 {
-                    map[finalY, lnK] = 0x07;
+                    map2[finalY, lnK] = 0x07;
                     lnK = (lnK == 0 ? 255 : lnK - 1);
                 }
             }
             else
             {
                 lnK = (finalX == 255 ? 0 : finalX + 1);
-                while (map[finalY, lnK] == 0x05)
+                while (map2[finalY, lnK] == 0x05)
                 {
-                    map[finalY, lnK] = 0x07;
+                    map2[finalY, lnK] = 0x07;
                     lnK = (lnK == 255 ? 0 : lnK + 1);
                 }
             }
@@ -1510,10 +1811,10 @@ namespace DQ12SFCRando
                 for (int lnJ = 0; lnJ < 5; lnJ++)
                 {
                     int byteToUse = 0x5b52d + (lnI * 5) + lnJ;
-                    int min = (lnI == 16 || lnI == 17 || lnI == 18 ? 30 : 1);
-                    int max = (lnI == 0 ? 5 : lnI == 1 ? 10 : lnI == 2 ? 15 : 38);
+                    int min = (lnI == 16 || lnI == 17 || lnI == 18 ? 30 : 0);
+                    int max = (lnI == 0 ? 6 : lnI == 1 ? 11 : lnI == 2 ? 16 : 38);
 
-                    romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min);
+                    romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min + 1);
                 }
             }
 
@@ -1563,6 +1864,24 @@ namespace DQ12SFCRando
             princessMonster = legalMonsters2[(r1.Next() % (legalMonsters2.Length))];
 
             romData[0x500f] = (byte)princessMonster;
+
+            ////////////////////////////////////////////////////////////////////////////
+            // Dragon Quest 2 Monster Zones start here
+            ////////////////////////////////////////////////////////////////////////////
+
+            for (int lnI = 0; lnI < 60; lnI++)
+            {
+                for (int lnJ = 0; lnJ < 6; lnJ++)
+                {
+                    int byteToUse = 0x5bec5 + (lnI * 8) + lnJ;
+                    int min = (lnI >= 40 && lnI <= 57 ? 4 * (lnI - 39) : 0);
+                    int max = (lnI < 21 ? (lnI + 1) * 2 : 80);
+
+                    romData[byteToUse] = (byte)((r1.Next() % (max - min)) + min + 1);
+                }
+            }
+
+
         }
 
         private void randomizeMonsterPatterns(Random r1)
@@ -1628,12 +1947,16 @@ namespace DQ12SFCRando
             }
 
             int[] dq1Spells = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] dq2Spells = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+            //int[] dq2Spells = { 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+            int[] dq2PrinceSpells = { 0x16, 0x0b, 0x1a, 0x11, 0x1c, 0x1b, 0x17, 0x1e, 0x0c, 0x14, 0x0f, 0x20, 0x15 };
+            int[] dq2PrincessSpells = { 0x17, 0x10, 0x0e, 0x12, 0x1d, 0x13, 0x1a, 0x18, 0x1b, 0x0d, 0x20, 0x19, 0x1f };
 
             for (int lnJ = 0; lnJ < dq1Spells.Length * 20; lnJ++)
                 swapArray(dq1Spells, (r1.Next() % dq1Spells.Length), (r1.Next() % dq1Spells.Length));
-            for (int lnJ = 0; lnJ < dq2Spells.Length * 20; lnJ++)
-                swapArray(dq2Spells, (r1.Next() % dq2Spells.Length), (r1.Next() % dq2Spells.Length));
+            for (int lnJ = 0; lnJ < dq2PrinceSpells.Length * 20; lnJ++)
+                swapArray(dq2PrinceSpells, (r1.Next() % dq2PrinceSpells.Length), (r1.Next() % dq2PrinceSpells.Length));
+            for (int lnJ = 0; lnJ < dq2PrincessSpells.Length * 20; lnJ++)
+                swapArray(dq2PrincessSpells, (r1.Next() % dq2PrincessSpells.Length), (r1.Next() % dq2PrincessSpells.Length));
 
             int[] dq1SpellsLearned = inverted_power_curve(0, 16, 10, 1.0, r1);
             int prevLevel = 0;
@@ -1652,20 +1975,73 @@ namespace DQ12SFCRando
                 }
             }
 
+            int[] dq2PrinceSpellsLearned = inverted_power_curve(0, 30, 13, 1.0, r1);
+            prevLevel = 0;
+            int dq2StarterSpells = 0;
+            for (int lnJ = 0; lnJ < dq2PrinceSpells.Length; lnJ++)
+            {
+                if (dq2PrinceSpellsLearned[lnJ] == 0) dq2PrinceSpellsLearned[lnJ] = 1;
+                if (dq2PrinceSpellsLearned[lnJ] == 1) dq2StarterSpells++;
+                if (prevLevel >= 2 && dq2PrinceSpellsLearned[lnJ] <= prevLevel)
+                {
+                    dq2PrinceSpellsLearned[lnJ]++;
+                    lnJ--;
+                }
+                else
+                {
+                    prevLevel = dq2PrinceSpellsLearned[lnJ];
+                }
+            }
+            romData[0xda100] = (byte)dq2StarterSpells;
+
+            int[] dq2PrincessSpellsLearned = inverted_power_curve(0, 30, 13, 1.0, r1);
+            prevLevel = 0;
+            dq2StarterSpells = 0;
+            for (int lnJ = 0; lnJ < dq2PrincessSpells.Length; lnJ++)
+            {
+                if (dq2PrincessSpellsLearned[lnJ] == 0) dq2PrincessSpellsLearned[lnJ] = 1;
+                if (dq2PrincessSpellsLearned[lnJ] == 1) dq2StarterSpells++;
+                if (prevLevel >= 2 && dq2PrincessSpellsLearned[lnJ] <= prevLevel)
+                {
+                    dq2PrincessSpellsLearned[lnJ]++;
+                    lnJ--;
+                }
+                else
+                {
+                    prevLevel = dq2PrincessSpellsLearned[lnJ];
+                }
+            }
+
+            romData[0xda105] = (byte)dq2StarterSpells;
+
             for (int lnJ = 0; lnJ < dq1SpellsLearned.Length; lnJ++)
                 romData[0x5bcd5 + lnJ] = (byte)dq1SpellsLearned[lnJ];
 
             for (int lnJ = 0; lnJ < dq1Spells.Length; lnJ++)
                 romData[0x5bd05 + lnJ] = (byte)dq1Spells[lnJ];
 
-            int[] strength = inverted_power_curve(4, 150, 30, 1.18, r1);
-            int[] agility = inverted_power_curve(4, 145, 30, 1.32, r1);
-            int[] hp = inverted_power_curve(10, 230, 30, 0.98, r1);
-            int[] mp = inverted_power_curve(0, 220, 30, 0.95, r1);
+            for (int lnJ = 0; lnJ < dq2PrinceSpellsLearned.Length; lnJ++)
+                romData[0x5bce1 + lnJ] = (byte)dq2PrinceSpellsLearned[lnJ];
+
+            for (int lnJ = 0; lnJ < dq2PrinceSpells.Length; lnJ++)
+                romData[0x5bd0f + lnJ] = (byte)dq2PrinceSpells[lnJ];
+
+            for (int lnJ = 0; lnJ < dq2PrincessSpellsLearned.Length; lnJ++)
+                romData[0x5bcef + lnJ] = (byte)dq2PrincessSpellsLearned[lnJ];
+
+            for (int lnJ = 0; lnJ < dq2PrincessSpells.Length; lnJ++)
+                romData[0x5bd1c + lnJ] = (byte)dq2PrincessSpells[lnJ];
+
+
+            int[] strength = inverted_power_curve(4, 150, 30, 1.09, r1); // Was 1.18
+            int[] agility = inverted_power_curve(4, 145, 30, 1.16, r1); // Was 1.32
+            int[] hp = inverted_power_curve(10, 230, 30, 1, r1); // Was 0.98
+            int[] mp = inverted_power_curve(0, 220, 30, 0.99, r1); // Was 0.95
             int[] resilience = new int[30];
             for (int lnI = 0; lnI < 30; lnI++)
                 resilience[lnI] = agility[lnI] / 2;
 
+            // First, infuse starting statistic code block
             // @ 9FCA - 4C 00 DD - JMP DD00
             // @ DD00 - AGILITY:  B9 3D A0, 48, 29 0F, 18, 69 XX, 8D 21 0C, 4A, 8D 39 0C,
             // STRENGTH:  68, 4A, 4A, 4A, 4A, 18, 69 XX, 8D 1D 0C
@@ -1688,6 +2064,7 @@ namespace DQ12SFCRando
             for (int lnI = 0; lnI < startingStats.Length; lnI++)
                 romData[0xdd000 + lnI] = startingStats[lnI];
 
+            // Implement stat gains here
             for (int lnI = 1; lnI < 30; lnI++)
             {
                 romData[0x5b909 + 1 + lnI] = (byte)(strength[lnI] - strength[lnI - 1]);
@@ -1713,6 +2090,76 @@ namespace DQ12SFCRando
                 romData[0x5bac2 + 1 + lnI] = (byte)(resilience[lnI] - resilience[lnI - 1]);
                 romData[0x5bb8f + 1 + lnI] = (byte)(hp[lnI] - hp[lnI - 1]);
                 romData[0x5bc5c + 1 + lnI] = (byte)(mp[lnI] - mp[lnI - 1]);
+            }
+
+            ////////////////////////////////////////////////////////////////////////
+            // Dragon Quest II Stats
+            ////////////////////////////////////////////////////////////////////////
+
+            // OK, time to set up Hero stats
+            strength = inverted_power_curve(16, 170, 50, 1, r1);
+            agility = inverted_power_curve(10, 150, 50, 1, r1);
+            hp = inverted_power_curve(20, 245, 50, 1, r1);
+            mp = inverted_power_curve(0, 0, 50, 1, r1);
+            resilience = new int[50];
+            for (int lnI = 0; lnI < 50; lnI++)
+                resilience[lnI] = agility[lnI] / 2;
+
+            romData[0xda0f7] = (byte)strength[0];
+            romData[0xda0f8] = (byte)agility[0];
+            romData[0xda0f9] = (byte)hp[0];
+            for (int lnI = 1; lnI < 50; lnI++)
+            {
+                romData[0x5b909 + 62 + 1 + lnI] = (byte)(strength[lnI] - strength[lnI - 1]);
+                romData[0x5b9d6 + 62 + 1 + lnI] = (byte)(agility[lnI] - agility[lnI - 1]);
+                romData[0x5baa3 + 62 + 1 + lnI] = (byte)(resilience[lnI] - resilience[lnI - 1]);
+                romData[0x5bb70 + 62 + 1 + lnI] = (byte)(hp[lnI] - hp[lnI - 1]);
+            }
+
+            // Prince stats
+            strength = inverted_power_curve(4, 150, 45, 1, r1);
+            agility = inverted_power_curve(4, 150, 45, 1, r1);
+            hp = inverted_power_curve(10, 210, 45, 1, r1);
+            mp = inverted_power_curve(0, 170, 45, 1, r1);
+            resilience = new int[45];
+            for (int lnI = 0; lnI < 45; lnI++)
+                resilience[lnI] = agility[lnI] / 2;
+
+            romData[0xda0fc] = (byte)strength[0];
+            romData[0xda0fd] = (byte)agility[0];
+            romData[0xda0fe] = (byte)hp[0];
+            romData[0xda0ff] = (byte)mp[0];
+            //romData[0xda100] = (byte)spellStart[0];
+            for (int lnI = 1; lnI < 45; lnI++)
+            {
+                romData[0x5b909 + 113 + 1 + lnI] = (byte)(strength[lnI] - strength[lnI - 1]);
+                romData[0x5b9d6 + 113 + 1 + lnI] = (byte)(agility[lnI] - agility[lnI - 1]);
+                romData[0x5baa3 + 113 + 1 + lnI] = (byte)(resilience[lnI] - resilience[lnI - 1]);
+                romData[0x5bb70 + 113 + 1 + lnI] = (byte)(hp[lnI] - hp[lnI - 1]);
+                romData[0x5bc3d + 62 + 1 + lnI] = (byte)(mp[lnI] - mp[lnI - 1]);
+            }
+
+            // Princess stats
+            strength = inverted_power_curve(4, 100, 35, 1, r1);
+            agility = inverted_power_curve(4, 180, 35, 1, r1);
+            hp = inverted_power_curve(10, 190, 35, 1, r1);
+            mp = inverted_power_curve(0, 210, 35, 1, r1);
+            resilience = new int[35];
+            for (int lnI = 0; lnI < 35; lnI++)
+                resilience[lnI] = agility[lnI] / 2;
+
+            romData[0xda101] = (byte)strength[0];
+            romData[0xda102] = (byte)agility[0];
+            romData[0xda103] = (byte)hp[0];
+            romData[0xda104] = (byte)mp[0];
+            //romData[0xda105] = (byte)spellStart[0];
+            for (int lnI = 1; lnI < 35; lnI++)
+            {
+                romData[0x5b909 + 159 + 1 + lnI] = (byte)(strength[lnI] - strength[lnI - 1]);
+                romData[0x5b9d6 + 159 + 1 + lnI] = (byte)(agility[lnI] - agility[lnI - 1]);
+                romData[0x5baa3 + 159 + 1 + lnI] = (byte)(resilience[lnI] - resilience[lnI - 1]);
+                romData[0x5bb70 + 159 + 1 + lnI] = (byte)(hp[lnI] - hp[lnI - 1]);
+                romData[0x5bc3d + 108 + 1 + lnI] = (byte)(mp[lnI] - mp[lnI - 1]);
             }
         }
 
@@ -1754,9 +2201,6 @@ namespace DQ12SFCRando
                 0xbe, 0xc0, 0xc2,
                 0x0c, 0x18, 0x1c, 0x12, 0x28, 0x0c, 0x3e, 0x02, 0x0a, 0x02, 0x18, 0x0e };
 
-            //List<int> dq1Jars = new List<int> { 3, 9, 10, 11, 12, 13, 21, 22, 23, 33, 34, 35 };
-            //List<int> keyItems = new List<int> { 0x10, 0x1a, 0x1c };
-
             // Limits:  2, 36, 48
             int[] dq1Max = { 48, 48, 2,
                 48, 48, 48, 48, 48,
@@ -1789,6 +2233,100 @@ namespace DQ12SFCRando
             {
                 romData[dq1Zone1[lnI]] = (byte)((dq1Items[lnI]) / 2 + 0x80);
             }
+
+            ////////////////////////////////////////////////////////////////////
+            // Dragon Quest II
+            ////////////////////////////////////////////////////////////////////
+
+            int[] dq2Zone1 = { 0xe2e56, // 0
+                0xe32a0, // 1
+                0xe4c23, 0xe4c3d, 0xe4c57, // 2-4
+                0xe4b6a, 0xe4b84, 0xe4b9f, 0xe4bb9, 0xe4bd3, 0xe4bed, 0xe4c07, // 5-11
+                0xe4fa1, 0xe4fc9, 0xe4fd7, 0xe4ff6, // 12-15
+                0xe2630, 0xe264a, // 16-17
+                // Post Cloak
+                0xe4093, 0xe40ad, // 18-19
+                0xe65d8, // Grump - 20
+                0xe4ca8, // Charlock - 21
+                0xe3add, // Tantegel - 22
+                0xe51ac, 0xe55f0, 0xe564b, 0xe5665, // Lighthouse - 23-26
+                // Golden Key
+                0xe2dee, 0xe2dd4, 0xe2dba, 0xe2da0, 0xe2d6c, 0xe2d86, 0xe2dba, // Midenhall - 27-33
+                0xe33e8, // Cannock - 34
+                0xe51ee, // Lighthouse - 35
+                0xe64fa, 0xe6514, 0xe652e, 0xe6548, // Charlock - 36-39
+                0xe3ef5, 0xe3f0f, // Osterfair - 40-41
+                0xe501e, 0xe5038, 0xe5052, 0xe5087, 0xe50bc, 0x5e0d7, 0x5e0f1, 0x5e183, // Moon Tower - 42-49
+                // Sea Cave
+                0xe4cdc, 0xe4cf6, 0xe4d2b, 0xe4d45, 0xe4d89, 0xe4da3, 0xe4dbd, 0xe4e90, // 50-57 // 0xe4e0c (PLACE IN DEAD ZONE!!!!!  Linked to another chest)
+                // Rhone Cave
+                0xe625d, 0xe6379, 0xe6e86, 0xe6ea0, 0xe63e5, 0xe63ff, 0xe6419, 0xe6433, // 58-65
+                // Dead Zone
+                0xe600b, 0xe6025 // 66-67
+            }; 
+
+            int[] dq2Items = { 0xa2,
+                0xef,
+                0xc3, 0x97, 0xc4,
+                0x93, 0xc8, 0xea, 0xc4, 0xe4, 0xc6, 0xd0,
+                0xc3, 0x92, 0xc9, 0xcc,
+                0x81, 0x81,
+                // Post Cloak
+                0xd8, 0xc9,
+                0xc1,
+                0xab,
+                0xed,
+                0x8c, 0xa5, 0xe7, 0xea,
+                // Golden Key
+                0x94, 0xd9, 0x9e, 0xe8, 0xea, 0xc3, 0xef,
+                0xbe,
+                0x81,
+                0xe3, 0xf0, 0xb4, 0xec,
+                0xa4, 0xb7,
+                0x9e, 0x94, 0xeb, 0xe8, 0xe5, 0xeb, 0xc9, 0xce,
+                // Sea Cave
+                0xe8, 0x94, 0xf1, 0xc9, 0xf1, 0xec, 0xb5, 0xcf,
+                // Rhone Cave
+                0xcd, 0xe9, 0xc2, 0xc8, 0xb9, 0xbf, 0xe6, 0xae,
+                // Dead Zone
+                0xda, 0xba };
+
+            // Limits:  17, 26, 49, 57, 65, 67
+            int[] dq2Max = { 67,
+                67,
+                67, 67, 67,
+                67, 67, 67, 67, 67, 67, 26,
+                67, 67, 67, 17,
+                67, 67,
+                67, 67,
+                67,
+                67,
+                67,
+                67, 67, 67, 67,
+                67, 67, 67, 67, 67, 67, 67,
+                67,
+                67,
+                67, 67, 67, 67,
+                67, 67,
+                67, 67, 67, 67, 67, 67, 67, 49,
+                67, 67, 67, 67, 67, 67, 67, 57,
+                65, 67, 67, 67, 67, 67, 67, 67,
+                67, 67 };
+
+            for (int lnI = 0; lnI < dq2Zone1.Length * 25; lnI++)
+            {
+                int first = r1.Next() % dq2Zone1.Length;
+                int second = r1.Next() % dq2Zone1.Length;
+                if (first == second) continue;
+                if (second > dq2Max[first] || first > dq2Max[second]) continue;
+                swapArray(dq2Items, first, second);
+                swapArray(dq2Max, first, second);
+            }
+
+            for (int lnI = 0; lnI < dq2Zone1.Length; lnI++)
+            {
+                romData[dq2Zone1[lnI]] = (byte)(dq2Items[lnI]);
+            }
         }
 
         private void randomizeStores(Random r1)
@@ -1798,7 +2336,7 @@ namespace DQ12SFCRando
             int[] dq1ItemsCommon = { 18, 19, 20, 21 };
             int[] dq2ItemsCommon = { 71, 72, 73, 74, 75 };
             int[] dq1ItemsRare = { 35 };
-            int[] dq2ItemsRare = { 86 };
+            //int[] dq2ItemsRare = { 86 };
 
             List<int> inUse = new List<int>();
             for (int lnI = 0; lnI < 103; lnI++)
@@ -1848,6 +2386,17 @@ namespace DQ12SFCRando
                         legal = true;
                     }
                 }
+            }
+
+            // Place the Jailor's Key in a random DQ2 store
+            bool legalJail = false;
+            while (!legalJail)
+            {
+                int jailSlot = r1.Next() % 59;
+                int byteToUse = 0x4f0c1 + jailSlot;
+                if (romData[byteToUse] == 0xff) continue;
+                romData[byteToUse] = 0x56;
+                legalJail = true;
             }
         }
 

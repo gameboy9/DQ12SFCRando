@@ -62,7 +62,6 @@
             this.label8 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.cmdRandomize = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.chkSmallMap = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trkExperience)).BeginInit();
@@ -394,16 +393,6 @@
             this.cmdRandomize.UseVisualStyleBackColor = true;
             this.cmdRandomize.Click += new System.EventHandler(this.cmdRandomize_Click);
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Enabled = false;
-            this.checkBox1.Location = new System.Drawing.Point(233, 294);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(15, 14);
-            this.checkBox1.TabIndex = 86;
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // checkBox2
             // 
             this.checkBox2.AutoSize = true;
@@ -432,7 +421,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 414);
             this.Controls.Add(this.chkSmallMap);
-            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.cmdRandomize);
             this.Controls.Add(this.label9);
@@ -515,7 +503,6 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button cmdRandomize;
-        private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.CheckBox checkBox2;
         private System.Windows.Forms.CheckBox chkSmallMap;
     }
