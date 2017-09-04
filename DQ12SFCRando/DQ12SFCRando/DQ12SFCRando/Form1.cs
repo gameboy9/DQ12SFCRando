@@ -1869,8 +1869,9 @@ namespace DQ12SFCRando
             // Dragon Quest 2 Monster Zones start here
             ////////////////////////////////////////////////////////////////////////////
 
-            for (int lnI = 0; lnI < 60; lnI++)
+            for (int lnI = 0; lnI < 68; lnI++)
             {
+                if (lnI >= 60 && lnI <= 63) continue;
                 for (int lnJ = 0; lnJ < 6; lnJ++)
                 {
                     int byteToUse = 0x5bec5 + (lnI * 8) + lnJ;
@@ -1975,7 +1976,7 @@ namespace DQ12SFCRando
                 }
             }
 
-            int[] dq2PrinceSpellsLearned = inverted_power_curve(0, 30, 13, 1.0, r1);
+            int[] dq2PrinceSpellsLearned = inverted_power_curve(0, 25, 13, 1.0, r1);
             prevLevel = 0;
             int dq2StarterSpells = 0;
             for (int lnJ = 0; lnJ < dq2PrinceSpells.Length; lnJ++)
@@ -1994,7 +1995,7 @@ namespace DQ12SFCRando
             }
             romData[0xda100] = (byte)dq2StarterSpells;
 
-            int[] dq2PrincessSpellsLearned = inverted_power_curve(0, 30, 13, 1.0, r1);
+            int[] dq2PrincessSpellsLearned = inverted_power_curve(0, 22, 13, 1.0, r1);
             prevLevel = 0;
             dq2StarterSpells = 0;
             for (int lnJ = 0; lnJ < dq2PrincessSpells.Length; lnJ++)
@@ -2253,16 +2254,16 @@ namespace DQ12SFCRando
                 // Golden Key
                 0xe2dee, 0xe2dd4, 0xe2dba, 0xe2da0, 0xe2d6c, 0xe2d86, 0xe2dba, // Midenhall - 27-33
                 0xe33e8, // Cannock - 34
-                0xe51ee, // Lighthouse - 35
-                0xe64fa, 0xe6514, 0xe652e, 0xe6548, // Charlock - 36-39
-                0xe3ef5, 0xe3f0f, // Osterfair - 40-41
-                0xe501e, 0xe5038, 0xe5052, 0xe5087, 0xe50bc, 0x5e0d7, 0x5e0f1, 0x5e183, // Moon Tower - 42-49
+                //0xe51ee, // Lighthouse - 35 - do not change; this is for the stars crest.
+                0xe64fa, 0xe6514, 0xe652e, 0xe6548, // Charlock - 35-38
+                0xe3ef5, 0xe3f0f, // Osterfair - 39-40
+                0xe501e, 0xe5038, 0xe5052, 0xe5087, 0xe50bc, 0xe50d7, 0xe50f1, 0xe5183, // Moon Tower - 41-48
                 // Sea Cave
-                0xe4cdc, 0xe4cf6, 0xe4d2b, 0xe4d45, 0xe4d89, 0xe4da3, 0xe4dbd, 0xe4e90, // 50-57 // 0xe4e0c (PLACE IN DEAD ZONE!!!!!  Linked to another chest)
+                0xe4cdc, 0xe4cf6, 0xe4d2b, 0xe4d45, 0xe4d89, 0xe4da3, 0xe4dbd, 0xe4e90, // 49-56 // 0xe4e0c (PLACE IN DEAD ZONE!!!!!  Linked to another chest)
                 // Rhone Cave
-                0xe625d, 0xe6379, 0xe6e86, 0xe6ea0, 0xe63e5, 0xe63ff, 0xe6419, 0xe6433, // 58-65
+                0xe625d, 0xe6379, 0xe6e86, 0xe6ea0, 0xe63e5, 0xe63ff, 0xe6419, 0xe6433, // 57-64
                 // Dead Zone
-                0xe600b, 0xe6025 // 66-67
+                0xe600b, 0xe6025 // 65-66
             }; 
 
             int[] dq2Items = { 0xa2,
@@ -2280,7 +2281,7 @@ namespace DQ12SFCRando
                 // Golden Key
                 0x94, 0xd9, 0x9e, 0xe8, 0xea, 0xc3, 0xef,
                 0xbe,
-                0x81,
+                //0x81,
                 0xe3, 0xf0, 0xb4, 0xec,
                 0xa4, 0xb7,
                 0x9e, 0x94, 0xeb, 0xe8, 0xe5, 0xeb, 0xc9, 0xce,
@@ -2292,26 +2293,26 @@ namespace DQ12SFCRando
                 0xda, 0xba };
 
             // Limits:  17, 26, 49, 57, 65, 67
-            int[] dq2Max = { 67,
-                67,
-                67, 67, 67,
-                67, 67, 67, 67, 67, 67, 26,
-                67, 67, 67, 17,
-                67, 67,
-                67, 67,
-                67,
-                67,
-                67,
-                67, 67, 67, 67,
-                67, 67, 67, 67, 67, 67, 67,
-                67,
-                67,
-                67, 67, 67, 67,
-                67, 67,
-                67, 67, 67, 67, 67, 67, 67, 49,
-                67, 67, 67, 67, 67, 67, 67, 57,
-                65, 67, 67, 67, 67, 67, 67, 67,
-                67, 67 };
+            int[] dq2Max = { 66,
+                66,
+                66, 66, 66,
+                66, 66, 66, 66, 66, 66, 26,
+                66, 66, 66, 17,
+                66, 66,
+                66, 66,
+                66,
+                66,
+                66,
+                66, 66, 66, 66,
+                66, 66, 66, 66, 66, 66, 66,
+                66,
+                //67,
+                66, 66, 66, 66,
+                66, 66,
+                66, 66, 66, 66, 66, 66, 66, 48,
+                66, 66, 66, 66, 66, 66, 66, 56,
+                64, 66, 66, 66, 66, 66, 66, 66,
+                66, 66 };
 
             for (int lnI = 0; lnI < dq2Zone1.Length * 25; lnI++)
             {
@@ -2392,8 +2393,8 @@ namespace DQ12SFCRando
             bool legalJail = false;
             while (!legalJail)
             {
-                int jailSlot = r1.Next() % 59;
-                int byteToUse = 0x4f0c1 + jailSlot;
+                int jailSlot = r1.Next() % 41;
+                int byteToUse = 0x4f0d4 + jailSlot;
                 if (romData[byteToUse] == 0xff) continue;
                 romData[byteToUse] = 0x56;
                 legalJail = true;
@@ -2449,6 +2450,58 @@ namespace DQ12SFCRando
                 romData[textByte + 3] = (byte)(gp < 10 ? 0 : ((gp / 10) % 10) + 1);
                 romData[textByte + 4] = (byte)((gp % 10) + 1);
             }
+        }
+
+        private void radENG_CheckedChanged(object sender, EventArgs e)
+        {
+            lblRomImage.Text = "DQ 1+2 ROM Image";
+            lblCompareImage.Text = "Comparison Image";
+            lblSHA.Text = "SHA Checksum";
+            lblRequired.Text = "Required";
+            lblSeed.Text = "Seed";
+            lblFlags.Text = "Flags";
+            chkMonsterZones.Text = "Monster Zones";
+            chkMonsterPatterns.Text = "Monster Patterns";
+            chkHeroStats.Text = "Hero Stats";
+            chkTreasures.Text = "Treasures";
+            chkStores.Text = "Stores";
+            chkMap.Text = "Map";
+            lblExpBoost.Text = "Boost Experience/GP";
+            lblGPReq.Text = "Gold Requirements";
+            lblCrossGame.Text = "Cross Game";
+            lblRandomizeHeader.Text = "Randomize:";
+            chkSmallMap.Text = "Small map in DQ2";
+
+            btnBrowse.Text = btnCompareBrowse.Text = "Browse";
+            btnCompare.Text = "Compare";
+            btnNewSeed.Text = "New Seed";
+            cmdRandomize.Text = "Randomize";
+        }
+
+        private void radJP_CheckedChanged(object sender, EventArgs e)
+        {
+            lblRomImage.Text = "DQ 1+2 ROMイメージ";
+            lblCompareImage.Text = "比較のイメージ";
+            lblSHA.Text = "SHA チェックサム";
+            lblRequired.Text = "必要なチェックサム";
+            lblSeed.Text = "シード";
+            lblFlags.Text = "フラグ";
+            chkMonsterZones.Text = "エンカウントエリア";
+            chkMonsterPatterns.Text = "敵の行動";
+            chkHeroStats.Text = "勇者の強さ";
+            chkTreasures.Text = "宝箱";
+            chkStores.Text = "ショッピング";
+            chkMap.Text = "世界地図";
+            lblExpBoost.Text = "EXP/Gブースト";
+            lblGPReq.Text = "ショッピング価格";
+            lblCrossGame.Text = "クロスゲーム";
+            lblRandomizeHeader.Text = "ランダム化";
+            chkSmallMap.Text = "DQ2の小さい世界地図";
+
+            btnBrowse.Text = btnCompareBrowse.Text = "ブラウズ";
+            btnCompare.Text = "比較する";
+            btnNewSeed.Text = "ニューシード";
+            cmdRandomize.Text = "ランダム化する";
         }
     }
 }

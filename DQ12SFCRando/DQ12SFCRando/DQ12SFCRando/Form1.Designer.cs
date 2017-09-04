@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label10 = new System.Windows.Forms.Label();
+            this.lblFlags = new System.Windows.Forms.Label();
             this.txtFlags = new System.Windows.Forms.TextBox();
             this.btnNewSeed = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lblSeed = new System.Windows.Forms.Label();
             this.txtSeed = new System.Windows.Forms.TextBox();
             this.btnCompareBrowse = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
+            this.lblCompareImage = new System.Windows.Forms.Label();
             this.txtCompare = new System.Windows.Forms.TextBox();
             this.btnCompare = new System.Windows.Forms.Button();
             this.lblReqChecksum = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.lblRequired = new System.Windows.Forms.Label();
             this.lblSHAChecksum = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblSHA = new System.Windows.Forms.Label();
             this.btnBrowse = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblRomImage = new System.Windows.Forms.Label();
             this.txtFileName = new System.Windows.Forms.TextBox();
             this.chkMonsterZones = new System.Windows.Forms.CheckBox();
             this.chkMonsterPatterns = new System.Windows.Forms.CheckBox();
@@ -50,7 +50,7 @@
             this.chkTreasures = new System.Windows.Forms.CheckBox();
             this.chkStores = new System.Windows.Forms.CheckBox();
             this.chkMonsterZonesCross = new System.Windows.Forms.CheckBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblCrossGame = new System.Windows.Forms.Label();
             this.chkMonsterPatternsCross = new System.Windows.Forms.CheckBox();
             this.chkTreasuresCross = new System.Windows.Forms.CheckBox();
             this.chkStoresCross = new System.Windows.Forms.CheckBox();
@@ -59,23 +59,26 @@
             this.lblExperience = new System.Windows.Forms.Label();
             this.lblGoldReq = new System.Windows.Forms.Label();
             this.lblStatus = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.lblExpBoost = new System.Windows.Forms.Label();
+            this.lblGPReq = new System.Windows.Forms.Label();
             this.cmdRandomize = new System.Windows.Forms.Button();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.chkMap = new System.Windows.Forms.CheckBox();
             this.chkSmallMap = new System.Windows.Forms.CheckBox();
+            this.radENG = new System.Windows.Forms.RadioButton();
+            this.radJP = new System.Windows.Forms.RadioButton();
+            this.lblRandomizeHeader = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.trkExperience)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkGoldReq)).BeginInit();
             this.SuspendLayout();
             // 
-            // label10
+            // lblFlags
             // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(291, 113);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(32, 13);
-            this.label10.TabIndex = 58;
-            this.label10.Text = "Flags";
+            this.lblFlags.AutoSize = true;
+            this.lblFlags.Location = new System.Drawing.Point(291, 113);
+            this.lblFlags.Name = "lblFlags";
+            this.lblFlags.Size = new System.Drawing.Size(32, 13);
+            this.lblFlags.TabIndex = 58;
+            this.lblFlags.Text = "Flags";
             // 
             // txtFlags
             // 
@@ -89,20 +92,20 @@
             // 
             this.btnNewSeed.Location = new System.Drawing.Point(186, 109);
             this.btnNewSeed.Name = "btnNewSeed";
-            this.btnNewSeed.Size = new System.Drawing.Size(75, 23);
+            this.btnNewSeed.Size = new System.Drawing.Size(86, 23);
             this.btnNewSeed.TabIndex = 49;
             this.btnNewSeed.Text = "New Seed";
             this.btnNewSeed.UseVisualStyleBackColor = true;
             this.btnNewSeed.Click += new System.EventHandler(this.btnNewSeed_Click);
             // 
-            // label3
+            // lblSeed
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 113);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(32, 13);
-            this.label3.TabIndex = 56;
-            this.label3.Text = "Seed";
+            this.lblSeed.AutoSize = true;
+            this.lblSeed.Location = new System.Drawing.Point(12, 113);
+            this.lblSeed.Name = "lblSeed";
+            this.lblSeed.Size = new System.Drawing.Size(32, 13);
+            this.lblSeed.TabIndex = 56;
+            this.lblSeed.Text = "Seed";
             // 
             // txtSeed
             // 
@@ -120,14 +123,14 @@
             this.btnCompareBrowse.Text = "Browse";
             this.btnCompareBrowse.UseVisualStyleBackColor = true;
             // 
-            // label5
+            // lblCompareImage
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 35);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(94, 13);
-            this.label5.TabIndex = 55;
-            this.label5.Text = "Comparison Image";
+            this.lblCompareImage.AutoSize = true;
+            this.lblCompareImage.Location = new System.Drawing.Point(12, 35);
+            this.lblCompareImage.Name = "lblCompareImage";
+            this.lblCompareImage.Size = new System.Drawing.Size(94, 13);
+            this.lblCompareImage.TabIndex = 55;
+            this.lblCompareImage.Text = "Comparison Image";
             // 
             // txtCompare
             // 
@@ -154,14 +157,14 @@
             this.lblReqChecksum.TabIndex = 54;
             this.lblReqChecksum.Text = "1c0c6d78bf2bc29160adf48b17ebf5a5bc46230e";
             // 
-            // label4
+            // lblRequired
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 88);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(50, 13);
-            this.label4.TabIndex = 53;
-            this.label4.Text = "Required";
+            this.lblRequired.AutoSize = true;
+            this.lblRequired.Location = new System.Drawing.Point(12, 88);
+            this.lblRequired.Name = "lblRequired";
+            this.lblRequired.Size = new System.Drawing.Size(50, 13);
+            this.lblRequired.TabIndex = 53;
+            this.lblRequired.Text = "Required";
             // 
             // lblSHAChecksum
             // 
@@ -172,14 +175,14 @@
             this.lblSHAChecksum.TabIndex = 52;
             this.lblSHAChecksum.Text = "????????????????????????????????????????";
             // 
-            // label2
+            // lblSHA
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 64);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(88, 13);
-            this.label2.TabIndex = 51;
-            this.label2.Text = "SHA1 Checksum";
+            this.lblSHA.AutoSize = true;
+            this.lblSHA.Location = new System.Drawing.Point(12, 64);
+            this.lblSHA.Name = "lblSHA";
+            this.lblSHA.Size = new System.Drawing.Size(88, 13);
+            this.lblSHA.TabIndex = 51;
+            this.lblSHA.Text = "SHA1 Checksum";
             // 
             // btnBrowse
             // 
@@ -191,14 +194,14 @@
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
-            // label1
+            // lblRomImage
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 13);
-            this.label1.TabIndex = 50;
-            this.label1.Text = "DQ 1+2 ROM Image";
+            this.lblRomImage.AutoSize = true;
+            this.lblRomImage.Location = new System.Drawing.Point(12, 9);
+            this.lblRomImage.Name = "lblRomImage";
+            this.lblRomImage.Size = new System.Drawing.Size(104, 13);
+            this.lblRomImage.TabIndex = 50;
+            this.lblRomImage.Text = "DQ 1+2 ROM Image";
             // 
             // txtFileName
             // 
@@ -273,14 +276,14 @@
             this.chkMonsterZonesCross.UseVisualStyleBackColor = true;
             this.chkMonsterZonesCross.CheckedChanged += new System.EventHandler(this.determineFlags);
             // 
-            // label6
+            // lblCrossGame
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(208, 154);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(64, 13);
-            this.label6.TabIndex = 68;
-            this.label6.Text = "Cross Game";
+            this.lblCrossGame.AutoSize = true;
+            this.lblCrossGame.Location = new System.Drawing.Point(208, 154);
+            this.lblCrossGame.Name = "lblCrossGame";
+            this.lblCrossGame.Size = new System.Drawing.Size(64, 13);
+            this.lblCrossGame.TabIndex = 68;
+            this.lblCrossGame.Text = "Cross Game";
             // 
             // chkMonsterPatternsCross
             // 
@@ -365,44 +368,44 @@
             this.lblStatus.Size = new System.Drawing.Size(0, 13);
             this.lblStatus.TabIndex = 80;
             // 
-            // label8
+            // lblExpBoost
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(28, 324);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(110, 13);
-            this.label8.TabIndex = 82;
-            this.label8.Text = "Boost Experience/GP";
+            this.lblExpBoost.AutoSize = true;
+            this.lblExpBoost.Location = new System.Drawing.Point(28, 324);
+            this.lblExpBoost.Name = "lblExpBoost";
+            this.lblExpBoost.Size = new System.Drawing.Size(110, 13);
+            this.lblExpBoost.TabIndex = 82;
+            this.lblExpBoost.Text = "Boost Experience/GP";
             // 
-            // label9
+            // lblGPReq
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(28, 347);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(153, 13);
-            this.label9.TabIndex = 83;
-            this.label9.Text = "Randomize Gold Requirements";
+            this.lblGPReq.AutoSize = true;
+            this.lblGPReq.Location = new System.Drawing.Point(28, 347);
+            this.lblGPReq.Name = "lblGPReq";
+            this.lblGPReq.Size = new System.Drawing.Size(153, 13);
+            this.lblGPReq.TabIndex = 83;
+            this.lblGPReq.Text = "Randomize Gold Requirements";
             // 
             // cmdRandomize
             // 
             this.cmdRandomize.Location = new System.Drawing.Point(458, 342);
             this.cmdRandomize.Name = "cmdRandomize";
-            this.cmdRandomize.Size = new System.Drawing.Size(75, 23);
+            this.cmdRandomize.Size = new System.Drawing.Size(96, 23);
             this.cmdRandomize.TabIndex = 84;
             this.cmdRandomize.Text = "Randomize";
             this.cmdRandomize.UseVisualStyleBackColor = true;
             this.cmdRandomize.Click += new System.EventHandler(this.cmdRandomize_Click);
             // 
-            // checkBox2
+            // chkMap
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Enabled = false;
-            this.checkBox2.Location = new System.Drawing.Point(12, 294);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(103, 17);
-            this.checkBox2.TabIndex = 85;
-            this.checkBox2.Text = "Randomize Map";
-            this.checkBox2.UseVisualStyleBackColor = true;
+            this.chkMap.AutoSize = true;
+            this.chkMap.Enabled = false;
+            this.chkMap.Location = new System.Drawing.Point(12, 294);
+            this.chkMap.Name = "chkMap";
+            this.chkMap.Size = new System.Drawing.Size(103, 17);
+            this.chkMap.TabIndex = 85;
+            this.chkMap.Text = "Randomize Map";
+            this.chkMap.UseVisualStyleBackColor = true;
             // 
             // chkSmallMap
             // 
@@ -415,16 +418,52 @@
             this.chkSmallMap.Text = "Small map in DQ2";
             this.chkSmallMap.UseVisualStyleBackColor = true;
             // 
+            // radENG
+            // 
+            this.radENG.AutoSize = true;
+            this.radENG.Location = new System.Drawing.Point(458, 154);
+            this.radENG.Name = "radENG";
+            this.radENG.Size = new System.Drawing.Size(48, 17);
+            this.radENG.TabIndex = 88;
+            this.radENG.TabStop = true;
+            this.radENG.Text = "ENG";
+            this.radENG.UseVisualStyleBackColor = true;
+            this.radENG.CheckedChanged += new System.EventHandler(this.radENG_CheckedChanged);
+            // 
+            // radJP
+            // 
+            this.radJP.AutoSize = true;
+            this.radJP.Location = new System.Drawing.Point(458, 179);
+            this.radJP.Name = "radJP";
+            this.radJP.Size = new System.Drawing.Size(37, 17);
+            this.radJP.TabIndex = 89;
+            this.radJP.TabStop = true;
+            this.radJP.Text = "JP";
+            this.radJP.UseVisualStyleBackColor = true;
+            this.radJP.CheckedChanged += new System.EventHandler(this.radJP_CheckedChanged);
+            // 
+            // lblRandomizeHeader
+            // 
+            this.lblRandomizeHeader.AutoSize = true;
+            this.lblRandomizeHeader.Location = new System.Drawing.Point(28, 154);
+            this.lblRandomizeHeader.Name = "lblRandomizeHeader";
+            this.lblRandomizeHeader.Size = new System.Drawing.Size(63, 13);
+            this.lblRandomizeHeader.TabIndex = 90;
+            this.lblRandomizeHeader.Text = "Randomize:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 414);
+            this.Controls.Add(this.lblRandomizeHeader);
+            this.Controls.Add(this.radJP);
+            this.Controls.Add(this.radENG);
             this.Controls.Add(this.chkSmallMap);
-            this.Controls.Add(this.checkBox2);
+            this.Controls.Add(this.chkMap);
             this.Controls.Add(this.cmdRandomize);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.label8);
+            this.Controls.Add(this.lblGPReq);
+            this.Controls.Add(this.lblExpBoost);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.lblGoldReq);
             this.Controls.Add(this.lblExperience);
@@ -433,28 +472,28 @@
             this.Controls.Add(this.chkStoresCross);
             this.Controls.Add(this.chkTreasuresCross);
             this.Controls.Add(this.chkMonsterPatternsCross);
-            this.Controls.Add(this.label6);
+            this.Controls.Add(this.lblCrossGame);
             this.Controls.Add(this.chkMonsterZonesCross);
             this.Controls.Add(this.chkStores);
             this.Controls.Add(this.chkTreasures);
             this.Controls.Add(this.chkHeroStats);
             this.Controls.Add(this.chkMonsterPatterns);
             this.Controls.Add(this.chkMonsterZones);
-            this.Controls.Add(this.label10);
+            this.Controls.Add(this.lblFlags);
             this.Controls.Add(this.txtFlags);
             this.Controls.Add(this.btnNewSeed);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lblSeed);
             this.Controls.Add(this.txtSeed);
             this.Controls.Add(this.btnCompareBrowse);
-            this.Controls.Add(this.label5);
+            this.Controls.Add(this.lblCompareImage);
             this.Controls.Add(this.txtCompare);
             this.Controls.Add(this.btnCompare);
             this.Controls.Add(this.lblReqChecksum);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.lblRequired);
             this.Controls.Add(this.lblSHAChecksum);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lblSHA);
             this.Controls.Add(this.btnBrowse);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblRomImage);
             this.Controls.Add(this.txtFileName);
             this.Name = "Form1";
             this.Text = "Dragon Quest 1+2 Randomizer";
@@ -469,21 +508,21 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label lblFlags;
         private System.Windows.Forms.TextBox txtFlags;
         private System.Windows.Forms.Button btnNewSeed;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblSeed;
         private System.Windows.Forms.TextBox txtSeed;
         private System.Windows.Forms.Button btnCompareBrowse;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblCompareImage;
         private System.Windows.Forms.TextBox txtCompare;
         private System.Windows.Forms.Button btnCompare;
         private System.Windows.Forms.Label lblReqChecksum;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblRequired;
         private System.Windows.Forms.Label lblSHAChecksum;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblSHA;
         private System.Windows.Forms.Button btnBrowse;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblRomImage;
         private System.Windows.Forms.TextBox txtFileName;
         private System.Windows.Forms.CheckBox chkMonsterZones;
         private System.Windows.Forms.CheckBox chkMonsterPatterns;
@@ -491,7 +530,7 @@
         private System.Windows.Forms.CheckBox chkTreasures;
         private System.Windows.Forms.CheckBox chkStores;
         private System.Windows.Forms.CheckBox chkMonsterZonesCross;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblCrossGame;
         private System.Windows.Forms.CheckBox chkMonsterPatternsCross;
         private System.Windows.Forms.CheckBox chkTreasuresCross;
         private System.Windows.Forms.CheckBox chkStoresCross;
@@ -500,11 +539,14 @@
         private System.Windows.Forms.Label lblExperience;
         private System.Windows.Forms.Label lblGoldReq;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label lblExpBoost;
+        private System.Windows.Forms.Label lblGPReq;
         private System.Windows.Forms.Button cmdRandomize;
-        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox chkMap;
         private System.Windows.Forms.CheckBox chkSmallMap;
+        private System.Windows.Forms.RadioButton radENG;
+        private System.Windows.Forms.RadioButton radJP;
+        private System.Windows.Forms.Label lblRandomizeHeader;
     }
 }
 
