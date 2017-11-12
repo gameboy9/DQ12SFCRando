@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DQ12SFCRando
@@ -2239,80 +2235,80 @@ namespace DQ12SFCRando
             // Dragon Quest II
             ////////////////////////////////////////////////////////////////////
 
-            int[] dq2Zone1 = { 0xe2e56, // 0
-                0xe32a0, // 1
-                0xe4c23, 0xe4c3d, 0xe4c57, // 2-4
-                0xe4b6a, 0xe4b84, 0xe4b9f, 0xe4bb9, 0xe4bd3, 0xe4bed, 0xe4c07, // 5-11
-                0xe4fa1, 0xe4fc9, 0xe4fd7, 0xe4ff6, // 12-15
-                0xe2630, 0xe264a, // 16-17
+            int[] dq2Zone1 = { //0xe2e56, // 0
+                0xe32a0, // 0
+                0xe4c23, 0xe4c3d, 0xe4c57, // 1-3
+                0xe4b6a, 0xe4b84, 0xe4b9f, 0xe4bb9, 0xe4bd3, 0xe4bed, 0xe4c07, // 4-10
+                0xe4fa1, 0xe4fc9, 0xe4fd7, 0xe4ff6, // 11-14
+                0xe2630, 0xe264a, // 15-16
                 // Post Cloak
-                0xe4093, 0xe40ad, // 18-19
-                0xe65d8, // Grump - 20
-                0xe4ca8, // Charlock - 21
-                0xe3add, // Tantegel - 22
-                0xe51ac, 0xe55f0, 0xe564b, 0xe5665, // Lighthouse - 23-26
+                0xe4093, 0xe40ad, // 17-18
+                0xe65d8, // Grump - 19
+                0xe4ca8, // Charlock - 20
+                0xe3add, // Tantegel - 21
+                0xe51ac, 0xe55f0, 0xe564b, 0xe5665, // Lighthouse - 22-25
                 // Golden Key
-                0xe2dee, 0xe2dd4, 0xe2dba, 0xe2da0, 0xe2d6c, 0xe2d86, 0xe2dba, // Midenhall - 27-33
-                0xe33e8, // Cannock - 34
-                //0xe51ee, // Lighthouse - 35 - do not change; this is for the stars crest.
-                0xe64fa, 0xe6514, 0xe652e, 0xe6548, // Charlock - 35-38
-                0xe3ef5, 0xe3f0f, // Osterfair - 39-40
-                0xe501e, 0xe5038, 0xe5052, 0xe5087, 0xe50bc, 0xe50d7, 0xe50f1, 0xe5183, // Moon Tower - 41-48
+                0xe2dee, 0xe2dd4, 0xe2dba, 0xe2da0, 0xe2d6c, 0xe2d86, 0xe2dba, // Midenhall - 26-32
+                0xe33e8, // Cannock - 33
+                //0xe51ee, // Lighthouse - 34 - do not change; this is for the stars crest.
+                0xe64fa, 0xe6514, 0xe652e, 0xe6548, // Charlock - 34-37
+                0xe3ef5, 0xe3f0f, // Osterfair - 38-39
+                0xe501e, 0xe5038, 0xe5052, 0xe5087, 0xe50bc, 0xe50d7, 0xe50f1, 0xe5183, // Moon Tower - 40-47
                 // Sea Cave
-                0xe4cdc, 0xe4cf6, 0xe4d2b, 0xe4d45, 0xe4d89, 0xe4da3, 0xe4dbd, 0xe4e90, // 49-56 // 0xe4e0c (PLACE IN DEAD ZONE!!!!!  Linked to another chest)
+                0xe4cdc, 0xe4cf6, 0xe4d2b, 0xe4d45, 0xe4d89, 0xe4da3, 0xe4dbd, 0xe4e90, // 48-55 // 0xe4e0c (PLACE IN DEAD ZONE!!!!!  Linked to another chest)
                 // Rhone Cave
-                0xe625d, 0xe6379, 0xe6e86, 0xe6ea0, 0xe63e5, 0xe63ff, 0xe6419, 0xe6433, // 57-64
+                0xe625d, 0xe6379, 0xe6e86, 0xe6ea0, 0xe63e5, 0xe63ff, 0xe6419, 0xe6433, // 56-63
                 // Dead Zone
-                0xe600b, 0xe6025 // 65-66
+                0xe600b, 0xe6025 // 64-65
             }; 
 
-            int[] dq2Items = { 0xa2,
+            int[] dq2Items = { //0xa2,
                 0xef,
                 0xc3, 0x97, 0xc4,
                 0x93, 0xc8, 0xea, 0xc4, 0xe4, 0xc6, 0xd0,
                 0xc3, 0x92, 0xc9, 0xcc,
                 0x81, 0x81,
-                // Post Cloak
+                // Post Cloak (17)
                 0xd8, 0xc9,
                 0xc1,
                 0xab,
                 0xed,
                 0x8c, 0xa5, 0xe7, 0xea,
-                // Golden Key
+                // Golden Key (9/26)
                 0x94, 0xd9, 0x9e, 0xe8, 0xea, 0xc3, 0xef,
                 0xbe,
                 //0x81,
                 0xe3, 0xf0, 0xb4, 0xec,
                 0xa4, 0xb7,
                 0x9e, 0x94, 0xeb, 0xe8, 0xe5, 0xeb, 0xc9, 0xce,
-                // Sea Cave
+                // Sea Cave (22/48)
                 0xe8, 0x94, 0xf1, 0xc9, 0xf1, 0xec, 0xb5, 0xcf,
-                // Rhone Cave
+                // Rhone Cave (8/56)
                 0xcd, 0xe9, 0xc2, 0xc8, 0xb9, 0xbf, 0xe6, 0xae,
-                // Dead Zone
+                // Dead Zone (8/64)
                 0xda, 0xba };
 
-            // Limits:  17, 26, 49, 57, 65, 67
-            int[] dq2Max = { 66,
-                66,
-                66, 66, 66,
-                66, 66, 66, 66, 66, 66, 26,
-                66, 66, 66, 17,
-                66, 66,
-                66, 66,
-                66,
-                66,
-                66,
-                66, 66, 66, 66,
-                66, 66, 66, 66, 66, 66, 66,
-                66,
+            // Limits:  16, 25, 47, 55, 63, 65
+            int[] dq2Max = { //66,
+                65,
+                65, 65, 65,
+                65, 65, 65, 65, 65, 65, 25,
+                65, 65, 65, 16,
+                65, 65,
+                65, 65,
+                65,
+                65,
+                65,
+                65, 65, 65, 65,
+                65, 65, 65, 65, 65, 65, 65,
+                65,
                 //67,
-                66, 66, 66, 66,
-                66, 66,
-                66, 66, 66, 66, 66, 66, 66, 48,
-                66, 66, 66, 66, 66, 66, 66, 56,
-                64, 66, 66, 66, 66, 66, 66, 66,
-                66, 66 };
+                65, 65, 65, 65,
+                65, 65,
+                65, 65, 65, 65, 65, 65, 65, 47,
+                65, 65, 65, 65, 65, 65, 65, 55,
+                63, 65, 65, 65, 65, 65, 65, 63,
+                65, 65 };
 
             for (int lnI = 0; lnI < dq2Zone1.Length * 25; lnI++)
             {
@@ -2328,6 +2324,18 @@ namespace DQ12SFCRando
             {
                 romData[dq2Zone1[lnI]] = (byte)(dq2Items[lnI]);
             }
+
+            // Randomize starting item
+            byte[] legalItems = { 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
+                0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
+                0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e,
+                0x5a, 0x5e, 0x5f,
+                0x60, 0x61, 0x62, 0x63, 0x64 };
+            romData[0xd9143] = legalItems[r1.Next() % legalItems.Length];
+
+            // Randomize starting gold
+            int startGold = inverted_power_curve(1, 255, 1, 0.5, r1)[0];
+            romData[0xd913e] = (byte)startGold;
         }
 
         private void randomizeStores(Random r1)
