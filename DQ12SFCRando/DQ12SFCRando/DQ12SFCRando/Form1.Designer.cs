@@ -67,6 +67,9 @@
             this.radENG = new System.Windows.Forms.RadioButton();
             this.radJP = new System.Windows.Forms.RadioButton();
             this.lblRandomizeHeader = new System.Windows.Forms.Label();
+            this.chkBattleSpeedHacks = new System.Windows.Forms.CheckBox();
+            this.chkDoubleWalking = new System.Windows.Forms.CheckBox();
+            this.chkHalfEncounterRate = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trkExperience)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkGoldReq)).BeginInit();
             this.SuspendLayout();
@@ -411,7 +414,7 @@
             // 
             this.chkSmallMap.AutoSize = true;
             this.chkSmallMap.Enabled = false;
-            this.chkSmallMap.Location = new System.Drawing.Point(274, 294);
+            this.chkSmallMap.Location = new System.Drawing.Point(233, 294);
             this.chkSmallMap.Name = "chkSmallMap";
             this.chkSmallMap.Size = new System.Drawing.Size(110, 17);
             this.chkSmallMap.TabIndex = 87;
@@ -451,11 +454,47 @@
             this.lblRandomizeHeader.TabIndex = 90;
             this.lblRandomizeHeader.Text = "Randomize:";
             // 
+            // chkBattleSpeedHacks
+            // 
+            this.chkBattleSpeedHacks.AutoSize = true;
+            this.chkBattleSpeedHacks.Location = new System.Drawing.Point(433, 225);
+            this.chkBattleSpeedHacks.Name = "chkBattleSpeedHacks";
+            this.chkBattleSpeedHacks.Size = new System.Drawing.Size(121, 17);
+            this.chkBattleSpeedHacks.TabIndex = 91;
+            this.chkBattleSpeedHacks.Text = "Battle Speed Hacks";
+            this.chkBattleSpeedHacks.UseVisualStyleBackColor = true;
+            this.chkBattleSpeedHacks.CheckedChanged += new System.EventHandler(this.determineFlags);
+            // 
+            // chkDoubleWalking
+            // 
+            this.chkDoubleWalking.AutoSize = true;
+            this.chkDoubleWalking.Location = new System.Drawing.Point(433, 247);
+            this.chkDoubleWalking.Name = "chkDoubleWalking";
+            this.chkDoubleWalking.Size = new System.Drawing.Size(136, 17);
+            this.chkDoubleWalking.TabIndex = 92;
+            this.chkDoubleWalking.Text = "Double Walking Speed";
+            this.chkDoubleWalking.UseVisualStyleBackColor = true;
+            this.chkDoubleWalking.CheckedChanged += new System.EventHandler(this.determineFlags);
+            // 
+            // chkHalfEncounterRate
+            // 
+            this.chkHalfEncounterRate.AutoSize = true;
+            this.chkHalfEncounterRate.Location = new System.Drawing.Point(433, 268);
+            this.chkHalfEncounterRate.Name = "chkHalfEncounterRate";
+            this.chkHalfEncounterRate.Size = new System.Drawing.Size(124, 17);
+            this.chkHalfEncounterRate.TabIndex = 93;
+            this.chkHalfEncounterRate.Text = "50% Encounter Rate";
+            this.chkHalfEncounterRate.UseVisualStyleBackColor = true;
+            this.chkHalfEncounterRate.CheckedChanged += new System.EventHandler(this.determineFlags);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 414);
+            this.Controls.Add(this.chkHalfEncounterRate);
+            this.Controls.Add(this.chkDoubleWalking);
+            this.Controls.Add(this.chkBattleSpeedHacks);
             this.Controls.Add(this.lblRandomizeHeader);
             this.Controls.Add(this.radJP);
             this.Controls.Add(this.radENG);
@@ -547,6 +586,9 @@
         private System.Windows.Forms.RadioButton radENG;
         private System.Windows.Forms.RadioButton radJP;
         private System.Windows.Forms.Label lblRandomizeHeader;
+        private System.Windows.Forms.CheckBox chkBattleSpeedHacks;
+        private System.Windows.Forms.CheckBox chkDoubleWalking;
+        private System.Windows.Forms.CheckBox chkHalfEncounterRate;
     }
 }
 

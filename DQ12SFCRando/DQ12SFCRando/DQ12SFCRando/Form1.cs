@@ -169,6 +169,8 @@ namespace DQ12SFCRando
             flags += convertIntToChar(number);
             number = (chkMonsterZonesCross.Checked ? 1 : 0) + (chkMonsterPatternsCross.Checked ? 2 : 0) + (chkTreasuresCross.Checked ? 4 : 0) + (chkStoresCross.Checked ? 8 : 0);
             flags += convertIntToChar(number);
+            number = (chkBattleSpeedHacks.Checked ? 1 : 0) + (chkDoubleWalking.Checked ? 2 : 0) + (chkHalfEncounterRate.Checked ? 4 : 0);
+            flags += convertIntToChar(number);
             flags += convertIntToChar(trkExperience.Value);
             flags += convertIntToChar(trkGoldReq.Value);
 
@@ -190,9 +192,13 @@ namespace DQ12SFCRando
             chkMonsterPatternsCross.Checked = (number % 4 >= 2);
             chkTreasuresCross.Checked = (number % 8 >= 4);
             chkStoresCross.Checked = (number % 16 >= 8);
-            trkExperience.Value = convertChartoInt(Convert.ToChar(flags.Substring(2, 1)));
+            number = convertChartoInt(Convert.ToChar(flags.Substring(2, 1)));
+            chkBattleSpeedHacks.Checked = (number % 2 == 1);
+            chkDoubleWalking.Checked = (number % 4 >= 2);
+            chkHalfEncounterRate.Checked = (number % 8 >= 4);
+            trkExperience.Value = convertChartoInt(Convert.ToChar(flags.Substring(3, 1)));
             trkExperience_Scroll(null, null);
-            trkGoldReq.Value = convertChartoInt(Convert.ToChar(flags.Substring(3, 1)));
+            trkGoldReq.Value = convertChartoInt(Convert.ToChar(flags.Substring(4, 1)));
             trkGoldReq_Scroll(null, null);
         }
 
@@ -257,11 +263,41 @@ namespace DQ12SFCRando
                 if (chkStores.Checked) randomizeStores(r1);
                 boostExp();
                 goldRequirements(r1);
+                speedHacks();
                 saveRom();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error:  " + ex.Message);
+            }
+        }
+
+        private void romPlugin(int locationStart, byte[] rom)
+        {
+            for (int lnI = 0; lnI < rom.Length; lnI++)
+                romData[locationStart + lnI] = rom[lnI];
+        }
+
+        private void speedHacks()
+        {
+            // 1 flash instead of 8 when a monster is hit.
+            if (chkBattleSpeedHacks.Checked)
+            {
+                romData[0x5cfd4] = 0x01;
+            }
+            // Double Walking Speed
+            if (chkDoubleWalking.Checked)
+            {
+                romPlugin(0x370, new byte[] { 0x4c, 0x90, 0xfb });
+                romPlugin(0x7b90, new byte[] { 0xa5, 0x66, 0x29, 0x01, 0xd0, 0x03, 0x4c, 0xe0, 0x82, 0x4c, 0xcc, 0x82 });
+                romPlugin(0x656, new byte[] { 0xea, 0xea, 0xea, 0xea, 0xea, 0xea, 0xea });
+            }
+            if (chkHalfEncounterRate.Checked)
+            {
+                // Single encounter rate
+                // romPlugin(0x5b515, new byte[] { 0x00, 0x00, 0x0C, 0x05, 0x0A, 0x0A, 0x0E, 0x0A, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x03, 0x07, 0x05, 0x07, 0x09, 0x0C, 0x07, 0x00, 0x00, 0x0A });
+                // Half encounter rate
+                romPlugin(0x5b515, new byte[] { 0x00, 0x00, 0x06, 0x03, 0x05, 0x05, 0x07, 0x05, 0x00, 0x00, 0x05, 0x00, 0x00, 0x02, 0x04, 0x03, 0x04, 0x05, 0x06, 0x04, 0x00, 0x00, 0x05 });
             }
         }
 
