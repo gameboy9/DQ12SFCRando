@@ -70,6 +70,7 @@
             this.chkBattleSpeedHacks = new System.Windows.Forms.CheckBox();
             this.chkDoubleWalking = new System.Windows.Forms.CheckBox();
             this.chkHalfEncounterRate = new System.Windows.Forms.CheckBox();
+            this.chkTextSpeedHacks = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.trkExperience)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trkGoldReq)).BeginInit();
             this.SuspendLayout();
@@ -457,7 +458,7 @@
             // chkBattleSpeedHacks
             // 
             this.chkBattleSpeedHacks.AutoSize = true;
-            this.chkBattleSpeedHacks.Location = new System.Drawing.Point(433, 225);
+            this.chkBattleSpeedHacks.Location = new System.Drawing.Point(433, 237);
             this.chkBattleSpeedHacks.Name = "chkBattleSpeedHacks";
             this.chkBattleSpeedHacks.Size = new System.Drawing.Size(121, 17);
             this.chkBattleSpeedHacks.TabIndex = 91;
@@ -468,7 +469,7 @@
             // chkDoubleWalking
             // 
             this.chkDoubleWalking.AutoSize = true;
-            this.chkDoubleWalking.Location = new System.Drawing.Point(433, 247);
+            this.chkDoubleWalking.Location = new System.Drawing.Point(433, 259);
             this.chkDoubleWalking.Name = "chkDoubleWalking";
             this.chkDoubleWalking.Size = new System.Drawing.Size(136, 17);
             this.chkDoubleWalking.TabIndex = 92;
@@ -479,7 +480,7 @@
             // chkHalfEncounterRate
             // 
             this.chkHalfEncounterRate.AutoSize = true;
-            this.chkHalfEncounterRate.Location = new System.Drawing.Point(433, 268);
+            this.chkHalfEncounterRate.Location = new System.Drawing.Point(433, 280);
             this.chkHalfEncounterRate.Name = "chkHalfEncounterRate";
             this.chkHalfEncounterRate.Size = new System.Drawing.Size(124, 17);
             this.chkHalfEncounterRate.TabIndex = 93;
@@ -487,11 +488,23 @@
             this.chkHalfEncounterRate.UseVisualStyleBackColor = true;
             this.chkHalfEncounterRate.CheckedChanged += new System.EventHandler(this.determineFlags);
             // 
+            // chkTextSpeedHacks
+            // 
+            this.chkTextSpeedHacks.AutoSize = true;
+            this.chkTextSpeedHacks.Location = new System.Drawing.Point(433, 215);
+            this.chkTextSpeedHacks.Name = "chkTextSpeedHacks";
+            this.chkTextSpeedHacks.Size = new System.Drawing.Size(115, 17);
+            this.chkTextSpeedHacks.TabIndex = 94;
+            this.chkTextSpeedHacks.Text = "Text Speed Hacks";
+            this.chkTextSpeedHacks.UseVisualStyleBackColor = true;
+            this.chkTextSpeedHacks.CheckedChanged += new System.EventHandler(this.determineFlags);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 414);
+            this.Controls.Add(this.chkTextSpeedHacks);
             this.Controls.Add(this.chkHalfEncounterRate);
             this.Controls.Add(this.chkDoubleWalking);
             this.Controls.Add(this.chkBattleSpeedHacks);
@@ -589,6 +602,7 @@
         private System.Windows.Forms.CheckBox chkBattleSpeedHacks;
         private System.Windows.Forms.CheckBox chkDoubleWalking;
         private System.Windows.Forms.CheckBox chkHalfEncounterRate;
+        private System.Windows.Forms.CheckBox chkTextSpeedHacks;
     }
 }
 

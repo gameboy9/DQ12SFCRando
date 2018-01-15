@@ -169,7 +169,7 @@ namespace DQ12SFCRando
             flags += convertIntToChar(number);
             number = (chkMonsterZonesCross.Checked ? 1 : 0) + (chkMonsterPatternsCross.Checked ? 2 : 0) + (chkTreasuresCross.Checked ? 4 : 0) + (chkStoresCross.Checked ? 8 : 0);
             flags += convertIntToChar(number);
-            number = (chkBattleSpeedHacks.Checked ? 1 : 0) + (chkDoubleWalking.Checked ? 2 : 0) + (chkHalfEncounterRate.Checked ? 4 : 0);
+            number = (chkBattleSpeedHacks.Checked ? 1 : 0) + (chkDoubleWalking.Checked ? 2 : 0) + (chkHalfEncounterRate.Checked ? 4 : 0) + (chkTextSpeedHacks.Checked ? 8 : 0);
             flags += convertIntToChar(number);
             flags += convertIntToChar(trkExperience.Value);
             flags += convertIntToChar(trkGoldReq.Value);
@@ -196,6 +196,7 @@ namespace DQ12SFCRando
             chkBattleSpeedHacks.Checked = (number % 2 == 1);
             chkDoubleWalking.Checked = (number % 4 >= 2);
             chkHalfEncounterRate.Checked = (number % 8 >= 4);
+            chkTextSpeedHacks.Checked = (number % 16 >= 8);
             trkExperience.Value = convertChartoInt(Convert.ToChar(flags.Substring(3, 1)));
             trkExperience_Scroll(null, null);
             trkGoldReq.Value = convertChartoInt(Convert.ToChar(flags.Substring(4, 1)));
@@ -280,6 +281,19 @@ namespace DQ12SFCRando
 
         private void speedHacks()
         {
+            if (chkTextSpeedHacks.Checked)
+            {
+                romPlugin(0x31c4, new byte[] { 0xea, 0xea, 0xea, 0xea }); // Talk to NPC speed hack
+                // Speed up DQ2 opening scene
+                romData[0x161e57] = romData[0x161ea2] = romData[0x16202c] = romData[0x16212a] = 0x01;
+                romData[0x161e6e] = romData[0x161e80] = romData[0x161e88] = romData[0x161e90] = romData[0x161e98] = romData[0x161eae] = romData[0x161eb5] = 0x01;
+                romData[0x1620e4] = romData[0x1621d6] = romData[0x1623bd] = romData[0x162404] = romData[0x1622c2] = romData[0x1622db] = romData[0x1622f4] = romData[0x16230d] = romData[0x162363] = romData[0x162392] = romData[0x162478] = 0x01;
+                romData[0x161ef2] = romData[0x161ef9] = romData[0x161eeb] = romData[0x161ee4] = romData[0x161ed7] = romData[0x161eda] = romData[0x161e3c] = romData[0x161e36] = 0x01;
+                romData[0x161f5b] = romData[0x161ed4] = romData[0x161f6c] = romData[0x161f7d] = romData[0x161f8e] = romData[0x161f9f] = romData[0x161fad] = romData[0x161fb2] = 0x01;
+                romData[0x161f00] = romData[0x161f07] = romData[0x161f0e] = romData[0x161f15] = romData[0x161f1c] = romData[0x161f23] = romData[0x161fc1] = romData[0x161fc7] = romData[0x161fca] = romData[0x161fcd] = romData[0x161fd0] = 0x01;
+                romData[0x30b2] = 0x02;
+                //romPlugin(0xb4e8, new byte[] { 0x20, 0x2e, 0xb7, 0xea }); // End of battle speed hack
+            }
             // 1 flash instead of 8 when a monster is hit.
             if (chkBattleSpeedHacks.Checked)
             {
@@ -298,6 +312,7 @@ namespace DQ12SFCRando
                 // romPlugin(0x5b515, new byte[] { 0x00, 0x00, 0x0C, 0x05, 0x0A, 0x0A, 0x0E, 0x0A, 0x00, 0x00, 0x0A, 0x00, 0x00, 0x03, 0x07, 0x05, 0x07, 0x09, 0x0C, 0x07, 0x00, 0x00, 0x0A });
                 // Half encounter rate
                 romPlugin(0x5b515, new byte[] { 0x00, 0x00, 0x06, 0x03, 0x05, 0x05, 0x07, 0x05, 0x00, 0x00, 0x05, 0x00, 0x00, 0x02, 0x04, 0x03, 0x04, 0x05, 0x06, 0x04, 0x00, 0x00, 0x05 });
+                romData[0x59739] = 0x03; // Also reduce encounter rate in caves.
             }
         }
 
